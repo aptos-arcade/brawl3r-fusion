@@ -21,13 +21,13 @@ namespace Player.Commands
         {
             if (player.PlayerState.MeleeEnergy >= player.PlayerStats.SideMeleeAttack.Energy)
             {
-                if (player.PlayerComponents.Animator.CurrentAnimationBody == "Body_Attack") return;
+                if (player.PlayerAnimations.IsCurrentBodyAnimation("Attack")) return;
                 player.PlayerReferences.Sword.strikerData = player.PlayerStats.SideMeleeAttack;
 
                 player.gameObject.transform.localScale = new Vector3(xScale, 1, 1);
                 player.PlayerReferences.PlayerCanvas.transform.localScale = new Vector3(xScale, 1, 1);
                 
-                player.PlayerComponents.Animator.SetAttackDirection(Directions.Side);
+                player.PlayerAnimations.SetAttackDirection(Directions.Side);
                 
                 player.PlayerActions.TrySwapWeapon(Global.Weapons.Sword);
                 player.PlayerActions.Attack();

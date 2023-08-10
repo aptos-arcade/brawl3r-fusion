@@ -40,28 +40,28 @@ namespace Photon
             Runner.SetPlayerObject(player, null);
         }
 
-        public IEnumerator SpawnCoroutine(PlayerController player)
-        {
-            if(!Runner.IsServer) yield break;
-            var spawnPosition = GetSpawnPoint(player.Object.InputAuthority);
-            player.transform.position = spawnPosition;
-            var portal = player.Runner.Spawn(
-                player.PlayerReferences.Portal,
-                spawnPosition,
-                Quaternion.identity
-            );
-            yield return new WaitForSeconds(2.5f);
-            player.Runner.Despawn(portal);
-            player.PlayerUtilities.DeathRevive(true);
-            // if(FusionUtils.IsLocalPlayer(player.Object)) GameManager.Instance.SetEnergyUIActive(true);
-            // player.photonView.RPC("OnRevive", RpcTarget.AllBuffered);
-            // player.photonView.RPC("TriggerInvincibility", RpcTarget.AllBuffered, true);
-            // yield return new WaitForSeconds(5f);
-            // if (player.PlayerState.IsInvincible)
-            // {
-            //     player.photonView.RPC("TriggerInvincibility", RpcTarget.AllBuffered, false);
-            // }
-        }
+        // public IEnumerator SpawnCoroutine(PlayerController player)
+        // {
+        //     if(!Runner.IsServer) yield break;
+        //     var spawnPosition = GetSpawnPoint(player.Object.InputAuthority);
+        //     player.transform.position = spawnPosition;
+        //     var portal = player.Runner.Spawn(
+        //         player.PlayerReferences.Portal,
+        //         spawnPosition,
+        //         Quaternion.identity
+        //     );
+        //     yield return new WaitForSeconds(2.5f);
+        //     player.Runner.Despawn(portal);
+        //     player.PlayerUtilities.DeathRevive(true);
+        //     // if(FusionUtils.IsLocalPlayer(player.Object)) GameManager.Instance.SetEnergyUIActive(true);
+        //     // player.photonView.RPC("OnRevive", RpcTarget.AllBuffered);
+        //     // player.photonView.RPC("TriggerInvincibility", RpcTarget.AllBuffered, true);
+        //     // yield return new WaitForSeconds(5f);
+        //     // if (player.PlayerState.IsInvincible)
+        //     // {
+        //     //     player.photonView.RPC("TriggerInvincibility", RpcTarget.AllBuffered, false);
+        //     // }
+        // }
     
         public void PlayerJoined(PlayerRef player)
         {

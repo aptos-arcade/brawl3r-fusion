@@ -378,6 +378,7 @@ GameObject:
   - component: {fileID: 2488860866195608730}
   - component: {fileID: 5832216820904233990}
   - component: {fileID: 5361271119361717527}
+  - component: {fileID: 9078014756482409827}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -419,7 +420,6 @@ MonoBehaviour:
     rigidBody: {fileID: 5761652101485717938}
     footCollider: {fileID: 8552428521242690844}
     bodyCollider: {fileID: 2488860866195608730}
-    animator: {fileID: 5761652100240516292}
     ground:
       serializedVersion: 2
       m_Bits: 128
@@ -452,7 +452,11 @@ MonoBehaviour:
     portal:
       RawGuidValue: 403b7e5513ead46a09694fccc442e453
     playerMesh: {fileID: 0}
+  playerAnimations:
+    player: {fileID: 5761652101485717936}
+    animator: {fileID: 5761652100240516292}
   playerCameraController: {fileID: 5832216820904233990}
+  playerRespawnController: {fileID: 9078014756482409827}
 --- !u!114 &5761652101485717939
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -481,6 +485,7 @@ MonoBehaviour:
   - {fileID: 5761652101485717936}
   - {fileID: 5761652101485717937}
   - {fileID: 5361271119361717527}
+  - {fileID: 9078014756482409827}
   - {fileID: 5761652100240516282}
   - {fileID: 5761652100240516292}
   SimulationBehaviours: []
@@ -767,6 +772,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   player: {fileID: 5761652101485717936}
+--- !u!114 &9078014756482409827
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5761652101485717943}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1c956ce52784cb8ae415ad4cb0105d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  playerController: {fileID: 5761652101485717936}
+  respawnDuration: 5
+  portalDuration: 10
 --- !u!1 &5761652101776268517
 GameObject:
   m_ObjectHideFlags: 0

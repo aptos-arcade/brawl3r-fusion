@@ -24,8 +24,7 @@ namespace Player.Commands
             if (player.PlayerUtilities.IsDodging) return;
             if (player.PlayerUtilities.IsDashing && Math.Abs(player.transform.localScale.x - direction) > 0.01)
             {
-                player.PlayerComponents.Animator.OnAnimationDone("Body_Dash");
-                player.PlayerComponents.Animator.OnAnimationDone("Legs_Dash");
+                player.PlayerAnimations.OnAnimationDone("Dash");
             }
             var elapsedTime = Time.time - lastPressTime;
             lastPressTime = Time.time;

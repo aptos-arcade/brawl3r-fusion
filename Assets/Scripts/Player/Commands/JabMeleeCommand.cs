@@ -15,13 +15,13 @@ namespace Player.Commands
 
         public override void WasPressed()
         {
-            if (player.PlayerComponents.Animator.CurrentAnimationBody == "Body_Attack") return;
+            if (player.PlayerAnimations.IsCurrentBodyAnimation("Attack")) return;
             if (player.PlayerUtilities.IsGrounded)
             {
                 if (player.PlayerState.MeleeEnergy >= player.PlayerStats.JabMeleeAttack.Energy)
                 {
                     player.PlayerReferences.Sword.strikerData = player.PlayerStats.JabMeleeAttack;
-                    player.PlayerComponents.Animator.SetAttackDirection(Directions.Neutral);
+                    player.PlayerAnimations.SetAttackDirection(Directions.Neutral);
                 }
                 else
                 {
@@ -34,7 +34,7 @@ namespace Player.Commands
                 if (player.PlayerState.MeleeEnergy >= player.PlayerStats.DownMeleeAttack.Energy)
                 {
                     player.PlayerReferences.Sword.strikerData = player.PlayerStats.DownMeleeAttack;
-                    player.PlayerComponents.Animator.SetAttackDirection(Directions.Down);
+                    player.PlayerAnimations.SetAttackDirection(Directions.Down);
                 }
                 else
                 {

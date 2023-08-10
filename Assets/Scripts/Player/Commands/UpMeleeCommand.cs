@@ -18,10 +18,10 @@ namespace Player.Commands
         {
             if (player.PlayerState.MeleeEnergy >= player.PlayerStats.UpMeleeAttack.Energy)
             {
-                if (player.PlayerComponents.Animator.CurrentAnimationBody == "Body_Attack") return;
+                if (player.PlayerAnimations.IsCurrentBodyAnimation("Attack")) return;
                 player.PlayerReferences.Sword.strikerData = player.PlayerStats.UpMeleeAttack;
                 
-                player.PlayerComponents.Animator.SetAttackDirection(Directions.Up);
+                player.PlayerAnimations.SetAttackDirection(Directions.Up);
                 
                 player.PlayerActions.TrySwapWeapon(Global.Weapons.Sword);
                 player.PlayerActions.Attack();

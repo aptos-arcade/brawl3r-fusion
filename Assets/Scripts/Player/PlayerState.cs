@@ -19,14 +19,15 @@ namespace Player
         
         [Networked] public NetworkButtons PrevButtons { get; set; }
         
-        [Networked(OnChanged = nameof(PlayerUtilities.HandleIsDeadChanged))] public NetworkBool IsDead { get; set; } = true;
+        [Networked] 
+        public NetworkBool IsDead { get; set; } = true;
         
-        [Networked(OnChanged = nameof(PlayerUtilities.HandleWeaponChanged))] public Global.Weapons Weapon { get; set; } = Global.Weapons.Gun;
+        [Networked(OnChanged = nameof(NetworkChangeHandlers.HandleWeaponChanged))] 
+        public Global.Weapons Weapon { get; set; } = Global.Weapons.Gun;
         
         [Networked] public NetworkBool IsInvincible { get; set; }
         
         [Networked] public float DamageMultiplier { get; set; } = 1;
-
 
         // local state
         public float HorizontalInput { get; set; }

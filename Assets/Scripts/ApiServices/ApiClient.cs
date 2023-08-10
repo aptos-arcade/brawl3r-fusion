@@ -38,7 +38,6 @@ namespace ApiServices
         public static IEnumerator PostRequest<TRequest, TResponse>(Action<TResponse> callback, string endpoint, TRequest payload)
         {
             var request = new UnityWebRequest($"{BaseUrl()}{endpoint}", "POST");
-            Debug.Log(JsonUtility.ToJson(payload));
             request.uploadHandler = new UploadHandlerRaw(new UTF8Encoding().GetBytes(JsonUtility.ToJson(payload)));
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("Content-Type", "application/json");

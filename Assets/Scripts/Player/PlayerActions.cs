@@ -14,7 +14,7 @@ namespace Player
             this.player = player;
         }
 
-        public void Move(Transform transform)
+        public void Move()
         {
             if (player.PlayerUtilities.IsStunned)
             {
@@ -25,12 +25,11 @@ namespace Player
             if(player.PlayerState.Direction.x != 0)
             {
                 var direction = player.PlayerState.Direction.x < 0 ? -1 : 1;
-                transform.localScale = new Vector3(direction, 1, 1);
+                player.transform.localScale = new Vector3(direction, 1, 1);
                 player.PlayerReferences.PlayerCanvas.transform.localScale = new Vector3(direction, 1, 1);
                 if (player.PlayerUtilities.IsGrounded)
                 {
-                    player.PlayerComponents.Animator.TryPlayAnimation("Body_Walk");
-                    player.PlayerComponents.Animator.TryPlayAnimation("Legs_Walk");
+                    player.PlayerAnimations.TryPlayAnimation("Walk");
                 }
                 if (!player.PlayerComponents.RunAudioSource.isPlaying)
                 {
@@ -39,8 +38,7 @@ namespace Player
             }
             else if(player.PlayerComponents.RigidBody.velocity.magnitude < 0.1f && player.PlayerUtilities.IsGrounded)
             {
-                player.PlayerComponents.Animator.TryPlayAnimation("Body_Idle");
-                player.PlayerComponents.Animator.TryPlayAnimation("Legs_Idle");
+                player.PlayerAnimations.TryPlayAnimation("Idle");
             }
             
             if(!player.PlayerUtilities.IsGrounded || player.PlayerComponents.RigidBody.velocity.magnitude < 0.1f || 
@@ -79,28 +77,25 @@ namespace Player
         {
             if (player.PlayerUtilities.IsGrounded)
             {
-                player.PlayerComponents.Animator.TryPlayAnimation("Legs_Jump");
-                player.PlayerComponents.Animator.TryPlayAnimation("Body_Jump");
+                player.PlayerAnimations.TryPlayAnimation("Jump");
             }
             else if(player.PlayerState.CanDoubleJump)
             {
-                player.PlayerComponents.Animator.TryPlayAnimation("Legs_Double_Jump");
-                player.PlayerComponents.Animator.TryPlayAnimation("Body_Double_Jump");
+                player.PlayerAnimations.TryPlayAnimation("Double_Jump");
             }
         }
 
         public void Attack()
         {
             player.PlayerUtilities.TriggerInvincibility(false);
-            player.PlayerComponents.Animator.TryPlayAnimation("Legs_Attack");
-            player.PlayerComponents.Animator.TryPlayAnimation("Body_Attack");
+            player.PlayerAnimations.TryPlayAnimation("Attack");
         }
 
         public void TrySwapWeapon(Global.Weapons weapon)
         {
             if(weapon == player.PlayerState.Weapon) return;
             player.PlayerState.Weapon = weapon;
-            player.PlayerComponents.Animator.SetWeapon((int)player.PlayerState.Weapon);
+            player.PlayerAnimations.SetWeapon(weapon);
             SwapWeapon();
         }
 
@@ -120,8 +115,7 @@ namespace Player
 
         private void PlayWeaponSound(AudioClip clip)
         {
-            player.PlayerReferences.WeaponObjects[(int)player.PlayerState.Weapon].GetComponent<Weapons.Weapon>()
-                .PlaySound(clip);
+            player.PlayerReferences.WeaponObjects[(int)player.PlayerState.Weapon].PlaySound(clip);
         }
 
         public void Drop()
@@ -167,21 +161,21 @@ namespace Player
             player.PlayerState.MeleeEnergy -= player.PlayerStats.DownMeleeAttack.Energy;
         }
 
-        public void Jump()
+        public void Jump(bool isDoubleJump)
         {
-            player.PlayerUtilities.JumpImpl(player.PlayerStats.JumpForce);
-        }
-        
-        public void DoubleJump()
-        {
-            player.PlayerState.CanDoubleJump = false;
-            player.PlayerUtilities.JumpImpl(player.PlayerStats.DoubleJumpForce);
+            if (isDoubleJump)
+            {
+                player.PlayerState.CanDoubleJump = false;
+            }
+            var jumpForce = isDoubleJump ? player.PlayerStats.DoubleJumpForce : player.PlayerStats.JumpForce;
+            player.PlayerComponents.RigidBody.velocity = new Vector2(player.PlayerComponents.RigidBody.velocity.x, 0);
+            player.PlayerComponents.RigidBody.AddForce(new Vector2(0, jumpForce), ForceMode2D.Force);
+            player.PlayerUtilities.PlayOneShotAudio(player.PlayerReferences.JumpAudioClip);
         }
 
         public void TryShield()
         {
-            player.PlayerComponents.Animator.TryPlayAnimation("Body_Shield");
-            player.PlayerComponents.Animator.TryPlayAnimation("Legs_Shield");
+            player.PlayerAnimations.TryPlayAnimation("Shield");
         }
 
         public void TriggerShield(bool active)
@@ -191,8 +185,7 @@ namespace Player
 
         public void TryDodge()
         {
-            player.PlayerComponents.Animator.TryPlayAnimation("Body_Dodge");
-            player.PlayerComponents.Animator.TryPlayAnimation("Legs_Dodge");
+            player.PlayerAnimations.TryPlayAnimation("Dodge");
         }
 
         public IEnumerator DodgeCoroutine()
@@ -209,8 +202,7 @@ namespace Player
         
         public void TryDash()
         {
-            player.PlayerComponents.Animator.TryPlayAnimation("Body_Dash");
-            player.PlayerComponents.Animator.TryPlayAnimation("Legs_Dash");
+            player.PlayerAnimations.TryPlayAnimation("Dash");
         }
 
         public void Dash()

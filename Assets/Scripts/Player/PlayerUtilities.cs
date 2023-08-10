@@ -21,10 +21,10 @@ namespace Player
         public bool IsGrounded => IsOnGround || IsOnPlatform;
         private bool IsFalling => player.PlayerComponents.RigidBody.velocity.y < 0 && !IsGrounded;
         
-        public bool IsDashing => player.PlayerComponents.Animator.CurrentAnimationBody == "Body_Dash";
-        public bool IsDodging => player.PlayerComponents.Animator.CurrentAnimationBody == "Body_Dodge";
-        public bool IsStunned => player.PlayerComponents.Animator.CurrentAnimationBody == "Body_Stunned";
-        public bool IsShielding => player.PlayerComponents.Animator.CurrentAnimationBody == "Body_Shield";
+        public bool IsDashing => player.PlayerAnimations.IsCurrentBodyAnimation("Dash");
+        public bool IsDodging => player.PlayerAnimations.IsCurrentBodyAnimation("Dodge");
+        public bool IsStunned => player.PlayerAnimations.IsCurrentBodyAnimation("Stunned");
+        public bool IsShielding => player.PlayerAnimations.IsCurrentBodyAnimation("Shield");
         
         public bool IsAcceptingInput => !player.PlayerState.IsDead && !player.PlayerState.IsDisabled 
                                                               && MatchManager.Instance.GameState != GameState.MatchOver;
@@ -65,11 +65,10 @@ namespace Player
             if (player.PlayerState.IsDisabled || 
                 !player.Runner.TryGetInputForPlayer<PlayerNetworkInput>(player.Object.InputAuthority, out var input))
                 return;
-            // if (IsStunned && Input.anyKeyDown)
-            // {
-            //     player.PlayerComponents.Animator.TryPlayAnimation("Body_Idle");
-            //     player.PlayerComponents.Animator.TryPlayAnimation("Legs_Idle");
-            // }
+            if (IsStunned && Input.anyKeyDown)
+            {
+                player.PlayerAnimations.TryPlayAnimation("Idle");
+            }
 
             if (player.PlayerState.CanMove)
             {
@@ -106,8 +105,7 @@ namespace Player
         {
             if(IsFalling)
             {
-                player.PlayerComponents.Animator.TryPlayAnimation("Body_Fall");
-                player.PlayerComponents.Animator.TryPlayAnimation("Legs_Fall");
+                player.PlayerAnimations.TryPlayAnimation("Fall");
             }
             if(IsGrounded)
             {
@@ -143,7 +141,7 @@ namespace Player
         {
             player.Runner.Spawn(player.PlayerReferences.ExplosionPrefab, player.transform.position, Quaternion.identity);
             player.PlayerUtilities.DeathRevive(false);
-            player.PlayerComponents.Animator.OnDeath();
+            player.PlayerAnimations.OnDeath();
             player.PlayerComponents.RigidBody.velocity = Vector2.zero;
             player.PlayerState.Direction = Vector2.zero;
             player.PlayerState.Lives--;
@@ -184,8 +182,7 @@ namespace Player
         {
             if (stunned)
             {
-                player.PlayerComponents.Animator.TryPlayAnimation("Body_Stunned");
-                player.PlayerComponents.Animator.TryPlayAnimation("Legs_Stunned");
+                player.PlayerAnimations.TryPlayAnimation("Stunned");
             }
             player.PlayerState.IsDisabled = stunned;
             player.PlayerState.CanMove = !stunned;
@@ -239,58 +236,31 @@ namespace Player
             Debug.Log("Setting IsDead to " + !isRevive + " and CanMove to " + isRevive + "");
             player.PlayerState.IsDead = !isRevive;
             player.PlayerState.CanMove = isRevive;
+            if (!isRevive)
+            {
+                player.PlayerCameraController.RemovePlayer(player.transform);
+                player.PlayerActions.UnEquipWeapons();
+            }
+            else
+            {
+                player.PlayerCameraController.AddPlayer(player.transform);
+                player.PlayerActions.SwapWeapon();
+            }
+            
+            if (FusionUtils.IsLocalPlayer(player.Object))
+            {
+                GameManager.Instance.SetEnergyUIActive(isRevive);
+            }
+            
+            player.PlayerReferences.PlayerObject.SetActive(isRevive);
+            
+            player.PlayerComponents.RigidBody.simulated = isRevive;
+            
+            player.PlayerState.MeleeEnergy = isRevive ? 0 : 1;
+            player.PlayerState.RangedEnergy = isRevive ? 0 : 1;
             
         }
 
-        public void JumpImpl(float jumpForce)
-        {
-            Debug.Log("Jump");
-            Debug.Log(jumpForce);
-            player.PlayerComponents.RigidBody.velocity = new Vector2(player.PlayerComponents.RigidBody.velocity.x, 0);
-            player.PlayerComponents.RigidBody.AddForce(new Vector2(0, jumpForce), ForceMode2D.Force);
-            PlayOneShotAudio(player.PlayerReferences.JumpAudioClip);
-        }
-
-        public void HandleAnimation(string animation)
-        {
-            switch (animation)
-            {
-                case "Shoot":
-                    player.PlayerActions.Shoot();
-                    break;
-                case "Side_Melee":
-                    player.PlayerActions.SideMelee();
-                    break;
-                case "Up_Melee":
-                    player.PlayerActions.UpMelee();
-                    break;
-                case "Jab_Melee":
-                    player.PlayerActions.JabMelee();
-                    break;
-                case "Down_Melee":
-                    player.PlayerActions.DownMelee();
-                    break;
-                case "Jump":
-                    player.PlayerActions.Jump();
-                    break;
-                case "Double_Jump":
-                    player.PlayerActions.DoubleJump();
-                    break;
-                case "Shield":
-                    player.PlayerActions.TriggerShield(true);
-                    break;
-                case "Dodge":
-                    player.StartCoroutine(player.PlayerActions.DodgeCoroutine());
-                    break;
-                case "Dash":
-                    player.PlayerActions.Dash();
-                    break;
-                case "FastFall":
-                    player.PlayerActions.FastFall();
-                    break;
-            }
-        }
-        
         public static bool IsSameTeam(NetworkObject other)
         {
             return MatchManager.Instance.SessionPlayers[other.InputAuthority].Team == 
@@ -313,42 +283,6 @@ namespace Player
         {
             player.PlayerComponents.OneShotAudioSource.Stop();
             player.PlayerComponents.OneShotAudioSource.PlayOneShot(clip);
-        }
-
-        public static void HandleWeaponChanged(Changed<PlayerController> changed)
-        {
-            changed.Behaviour.PlayerActions.SwapWeapon();
-        }
-        
-        public static void HandleIsDeadChanged(Changed<PlayerController> changed)
-        {
-            Debug.Log("HandleIsDeadChanged");
-            var isDead = changed.Behaviour.PlayerState.IsDead;
-            var player = changed.Behaviour;
-            Debug.Log("IsDead: " + isDead);
-            
-            if (isDead)
-            {
-                player.PlayerCameraController.RemovePlayer(player.transform);
-                player.PlayerActions.UnEquipWeapons();
-            }
-            else
-            {
-                player.PlayerCameraController.AddPlayer(player.transform);
-                player.PlayerActions.SwapWeapon();
-            }
-            
-            if (FusionUtils.IsLocalPlayer(player.Object))
-            {
-                GameManager.Instance.SetEnergyUIActive(!isDead);
-            }
-            
-            player.PlayerReferences.PlayerObject.SetActive(!isDead);
-            
-            player.PlayerComponents.RigidBody.simulated = !isDead;
-            
-            player.PlayerState.MeleeEnergy = isDead ? 0 : 1;
-            player.PlayerState.RangedEnergy = isDead ? 0 : 1;
         }
 
     }

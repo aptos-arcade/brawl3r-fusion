@@ -75,10 +75,10 @@ namespace Gameplay
             // ListPlayersSend();
         }
 
-        public void SpawnPlayer(PlayerController player)
-        {
-            StartCoroutine(spawnManager.SpawnCoroutine(player));
-        }
+        // public void SpawnPlayer(PlayerController player)
+        // {
+        //     StartCoroutine(spawnManager.SpawnCoroutine(player));
+        // }
 
         private void DeathFeedMessage(PlayerRef actorDeath, PlayerRef actorKill)
         {
@@ -94,10 +94,10 @@ namespace Gameplay
             }
         }
 
-        private void OnPlayerDeath()
-        {
-            respawnManager.StartRespawn();
-        }
+        // private void OnPlayerDeath()
+        // {
+        //     respawnManager.StartRespawn();
+        // }
 
         private void OnPlayerOutOfLives()
         {
