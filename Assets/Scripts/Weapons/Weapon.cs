@@ -7,9 +7,6 @@ namespace Weapons
     {
         // components
         private AudioSource audioSource;
-        
-        // networked properties
-        [Networked] private NetworkBool IsActive { get; set; }
 
         public override void Spawned()
         {
@@ -22,12 +19,12 @@ namespace Weapons
             audioSource.PlayOneShot(audioClip);
         }
 
-        public override void FixedUpdateNetwork()
-        {
-            if (IsActive != gameObject.activeSelf)
-            {
-                gameObject.SetActive(IsActive);
-            }
-        }
+        // public override void FixedUpdateNetwork()
+        // {
+        //     if (IsActive != gameObject.activeSelf)
+        //     {
+        //         gameObject.SetActive(IsActive);
+        //     }
+        // }
     }
 }

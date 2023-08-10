@@ -1,11 +1,11 @@
-using System;
 using System.Collections.Generic;
+using Photon;
 using ScriptableObjects;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Photon
+namespace MainMenu
 {
     public class MatchmakingManager : MonoBehaviour
     {
@@ -20,21 +20,21 @@ namespace Photon
 
         private void Start()
         {
-            roomName.text = RoomTitle(NetworkRunnerManager.Instance.SessionNumTeams,
-                NetworkRunnerManager.Instance.SessionMaxPlayers);
             backButton.onClick.AddListener(NetworkRunnerManager.Instance.LeaveRoom);
+            if(NetworkRunnerManager.Instance.NetworkRunner.IsServer)
+                ListAllPlayers();
         }
 
         private void OnEnable()
         {
             MatchManager.PlayerListChanged += ListAllPlayers;
-            NetworkRunnerManager.Instance.OnMatchCreateError += OnMatchCreateError;
+            MatchManager.OnMatchCreateError += OnMatchCreateError;
         }
         
         private void OnDisable()
         {
             MatchManager.PlayerListChanged -= ListAllPlayers;
-            NetworkRunnerManager.Instance.OnMatchCreateError -= OnMatchCreateError;
+            MatchManager.OnMatchCreateError -= OnMatchCreateError;
         }
 
 
@@ -54,16 +54,19 @@ namespace Photon
 
         private void ListAllPlayers()
         {
+            roomName.text = RoomTitle(MatchManager.Instance.SessionNumTeams,
+                MatchManager.Instance.SessionMaxPlayers);
+            
             foreach (var roomPlayer in allPlayers)
             {
                 Destroy(roomPlayer.gameObject);
             }
             allPlayers.Clear();
             
-            for(var i = 0; i < NetworkRunnerManager.Instance.SessionMaxPlayers; i++)
+            for(var i = 0; i < MatchManager.Instance.SessionMaxPlayers; i++)
             {
-                var player = NetworkRunnerManager.Instance.SessionPlayers[i];
-                if(player.Name.ToString() == string.Empty) continue;
+                var player = MatchManager.Instance.SessionPlayers[i];
+                if(!player.IsActive) continue;
                 AddPlayer(player);
             }
 
@@ -86,8 +89,8 @@ namespace Photon
 
         private void SetWaitingText()
         {
-            var remainingPlayers = NetworkRunnerManager.Instance.SessionMaxPlayers -
-                                   NetworkRunnerManager.Instance.SessionPlayerCount;
+            var remainingPlayers = MatchManager.Instance.SessionMaxPlayers -
+                                   MatchManager.Instance.SessionPlayerCount;
             if (remainingPlayers == 0)
             {
                 waitingText.text = "Loading the game...";

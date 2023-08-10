@@ -25,7 +25,7 @@ namespace Weapons
         //     );
         // }
 
-        // private static IEnumerator DisableCoroutine(PlayerScript player)
+        // private static IEnumerator DisableCoroutine(PlayerController player)
         // {
         //     player.PlayerComponents.BodyCollider.enabled = false;
         //     yield return new WaitForSeconds(0.25f);

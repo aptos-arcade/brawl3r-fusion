@@ -2,7 +2,7 @@ using Fusion;
 
 namespace Utilities
 {
-    public static class PhotonUtilities
+    public static class FusionUtils
     {
         public static bool IsLocalPlayer(NetworkObject networkObject)
         {

@@ -6,7 +6,7 @@ namespace Weapons
 {
     public class Striker: NetworkBehaviour
     {
-        // protected PlayerScript Owner;
+        // protected PlayerController Owner;
 
         public StrikerData strikerData;
 

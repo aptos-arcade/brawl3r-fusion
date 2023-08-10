@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using ApiServices;
 using Fusion;
 using Fusion.Photon.Realtime;
 using Fusion.Sockets;
@@ -26,51 +25,29 @@ namespace Photon
             }
         }
 
-        private const string ModePropKey = "m";
-        private const string NumTeamsPropKey = "nt";
+        public const string ModePropKey = "m";
+        public const string NumTeamsPropKey = "nt";
 
         [SerializeField] private NetworkRunner networkRunnerPrefab;
         [SerializeField] private MatchManager matchManagerPrefab;
         
-        private NetworkRunner networkRunner;
-
-        // session properties
+        // network properties
+        
+        public NetworkRunner NetworkRunner { get; private set; }
         
         public MatchManager MatchManager { get; set; }
 
-        public int SessionNumTeams => networkRunner == null 
-            ? 0 
-            : networkRunner.SessionInfo.Properties[NumTeamsPropKey];
-
-        public GameModes SessionGameMode => networkRunner == null
-            ? GameModes.None
-            : (GameModes)(int)networkRunner.SessionInfo.Properties[ModePropKey];
-
-        public int SessionMaxPlayers => networkRunner == null 
-            ? 0 
-            : networkRunner.SessionInfo.MaxPlayers;
-        
-        public int SessionPlayerCount => networkRunner == null
-            ? 0
-            : networkRunner.SessionInfo.PlayerCount;
-        
-        public PlayerInfo[] SessionPlayers => MatchManager == null
-            ? Array.Empty<PlayerInfo>()
-            : MatchManager.PlayerInfos.ToArray();
-        
         // events
         
-        public event Action OnMatchCreateError;
-
         public async void JoinRoom(Action<bool> callback, GameMode photonGameMode, GameModes gameMode, int numTeams, 
             int numPlayers)
         {
-            if (networkRunner == null)
+            if (NetworkRunner == null)
             {
-                networkRunner = Instantiate(networkRunnerPrefab);
+                NetworkRunner = Instantiate(networkRunnerPrefab);
             }
-            networkRunner.AddCallbacks(this);
-            networkRunner.ProvideInput = true;
+            NetworkRunner.AddCallbacks(this);
+            NetworkRunner.ProvideInput = true;
 
             var startGameArgs = new StartGameArgs
             {
@@ -81,17 +58,16 @@ namespace Photon
                     { NumTeamsPropKey, numTeams }
                 },
                 PlayerCount = numPlayers,
-                SceneManager = networkRunner.GetComponent<INetworkSceneManager>(),
+                SceneManager = NetworkRunner.GetComponent<INetworkSceneManager>(),
                 CustomPhotonAppSettings = BuildCustomAppSetting(RegionManager.Instance.SelectedRegion.code)
                 // ObjectPool = networkRunnerPrefab.GetComponent<ObjectPoolingManager>(),
             };
-            var result = await networkRunner.StartGame(startGameArgs);
+            var result = await NetworkRunner.StartGame(startGameArgs);
             if (result.Ok)
             {
-                if (networkRunner.IsServer)
+                if (NetworkRunner.IsServer)
                 {
-                    networkRunner.Spawn(matchManagerPrefab, Vector3.zero, Quaternion.identity);
-                    MatchManager.PlayerListChanged += TryStartGame;
+                    NetworkRunner.Spawn(matchManagerPrefab, Vector3.zero, Quaternion.identity);
                 }
                 callback(true);
             }
@@ -103,7 +79,7 @@ namespace Photon
         
         public void LeaveRoom()
         {
-            networkRunner.Shutdown();
+            NetworkRunner.Shutdown();
         }
         
         private static AppSettings BuildCustomAppSetting(string region, string customAppID = null, 
@@ -125,70 +101,9 @@ namespace Photon
             return appSettings;
         }
 
-        private void TryStartGame()
-        {
-            if (!networkRunner.IsServer || SessionMaxPlayers != SessionPlayerCount) return;
-            networkRunner.SessionInfo.IsOpen = false;
-            switch (SessionGameMode)
-            {
-                case GameModes.Casual:
-                    CreateCasualMatch();
-                    break;
-                case GameModes.Ranked:
-                    CreateRankedMatch();
-                    break;
-                case GameModes.Training:
-                case GameModes.None:
-                default:
-                    LoadGame();
-                    break;
-            }
-        }
-        
-        private List<List<string>> TeamsList()
-        {
-            List<List<string>> teams = new();
-            for(var i = 0; i < SessionNumTeams; i++) teams.Add(new List<string>());
-            for (var i = 0; i < SessionMaxPlayers; i++)
-            {
-                teams[SessionPlayers[i].Team].Add(SessionPlayers[i].Id.ToString());
-            }
-            return teams;
-        }
-
-        private void CreateCasualMatch()
-        {
-            StartCoroutine(CasualMatchServices.CreateMatch(TeamsList(), OnMatchCreated));
-        }
-
-        private void CreateRankedMatch()
-        {
-            StartCoroutine(RankedMatchServices.CreateMatch(TeamsList(), OnMatchCreated));
-        }
-        
-        private void OnMatchCreated(bool success, string message)
-        {
-            if (!success)
-            {
-                Debug.Log("Failed to create match");
-                OnMatchCreateError?.Invoke();
-                return;
-            }
-            Debug.Log($"Match created with id {message}");
-            MatchManager.MatchId = message;
-            MatchManager.PlayerListChanged -= TryStartGame;
-            LoadGame();
-        }
-
-        private void LoadGame()
-        {
-            networkRunner.SetActiveScene("GameplayScene");
-        }
-
         private void OnDisconnect()
         {
-            MatchManager.PlayerListChanged -= TryStartGame;
-            networkRunner = null;
+            NetworkRunner = null;
             SceneManager.LoadScene("ModeSelectScene");
         }
         
@@ -202,7 +117,9 @@ namespace Photon
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
             if (!runner.IsServer) return;
-            MatchManager.PlayerInfos.Set(player, default);
+            var playerInfo = MatchManager.PlayerInfos[player];
+            playerInfo.IsActive = false;
+            MatchManager.PlayerInfos.Set(player, playerInfo);
         }
 
         public void OnInput(NetworkRunner runner, NetworkInput input)
@@ -268,16 +185,16 @@ namespace Photon
         {
             Debug.Log("Host migration");
             await runner.Shutdown(shutdownReason: ShutdownReason.HostMigration);
-            networkRunner = null;
+            NetworkRunner = null;
 
             // Step 2.2
             // Create a new Runner.
-            networkRunner = Instantiate(networkRunnerPrefab);
+            NetworkRunner = Instantiate(networkRunnerPrefab);
 
             // setup the new runner...
 
             // Start the new Runner using the "HostMigrationToken" and pass a callback ref in "HostMigrationResume".
-            var result = await networkRunner.StartGame(new StartGameArgs() {
+            var result = await NetworkRunner.StartGame(new StartGameArgs() {
                 HostMigrationToken = hostMigrationToken,   // contains all necessary info to restart the Runner
                 HostMigrationResume = HostMigrationResume, // this will be invoked to resume the simulation
                 // other args
