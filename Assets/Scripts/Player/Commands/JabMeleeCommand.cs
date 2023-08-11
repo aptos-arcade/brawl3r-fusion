@@ -15,7 +15,7 @@ namespace Player.Commands
 
         public override void WasPressed()
         {
-            if (player.PlayerAnimations.IsCurrentBodyAnimation("Attack")) return;
+            if (player.PlayerAnimations.IsCurrentBodyAnimation(Animations.Animations.BodyAttack)) return;
             if (player.PlayerUtilities.IsGrounded)
             {
                 if (player.PlayerState.MeleeEnergy >= player.PlayerStats.JabMeleeAttack.Energy)

@@ -1,4 +1,4 @@
-namespace Animations
+namespace Player.Animations
 {
     public enum Rig { Body, Legs }
 
@@ -6,20 +6,21 @@ namespace Animations
     {
         public Rig AnimationRig { get; }
 
-        public string[] HigherPriority { get; }
+        public Animations[] HigherPriority { get; }
 
         public string Name { get; }
         
-        public bool Active { get; set; }
-        
         public bool HoldOnEnd { get; }
+        
+        public Animations AnimationsEnum { get; }
 
-        public AnyStateAnimation(Rig rig, bool holdOnEnd, string name, params string[] higherPriority)
+        public AnyStateAnimation(Rig rig, bool holdOnEnd, string name, Animations animationsEnum, params Animations[] higherPriority)
         {
             AnimationRig = rig;
             Name = name;
             HigherPriority = higherPriority;
             HoldOnEnd = holdOnEnd;
+            AnimationsEnum = animationsEnum;
         }
 
 

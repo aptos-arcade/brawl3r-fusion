@@ -1,10 +1,9 @@
 using Fusion;
-using Photon;
 using UnityEngine;
 
 namespace Player
 {
-    public class PlayerState
+    public class PlayerState: NetworkBehaviour
     {
         
         // networked state
@@ -19,11 +18,9 @@ namespace Player
         
         [Networked] public NetworkButtons PrevButtons { get; set; }
         
-        [Networked] 
-        public NetworkBool IsDead { get; set; } = true;
+        [Networked] public NetworkBool IsDead { get; set; } = true;
         
-        [Networked(OnChanged = nameof(NetworkChangeHandlers.HandleWeaponChanged))] 
-        public Global.Weapons Weapon { get; set; } = Global.Weapons.Gun;
+        [Networked] public Global.Weapons Weapon { get; set; } = Global.Weapons.Gun;
         
         [Networked] public NetworkBool IsInvincible { get; set; }
         

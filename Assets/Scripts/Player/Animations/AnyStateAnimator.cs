@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Animations;
 using Fusion;
 using Global;
 using UnityEngine;
-using Utilities;
 
 namespace Player.Animations
 {
@@ -14,17 +12,20 @@ namespace Player.Animations
     public class AnyStateAnimator : NetworkBehaviour
     {
         private Animator animator;
-
-        private readonly Dictionary<string, AnyStateAnimation> animations = new();
-
+        
+        private readonly Dictionary<Animations, AnyStateAnimation> animations = new();
+        
+        [Networked]
+        [Capacity(22)]
+        private NetworkDictionary<Animations, NetworkBool> ActiveAnimations { get; }
+        
+        [Networked] public Animations CurrentAnimationBody { get; private set; } = Animations.None;
+        
+        [Networked] private Animations CurrentAnimationLegs { get; set; } = Animations.None;
+        
         public AnimationTriggerEvent AnimationTriggerEvent { get; set; }
 
-        private string currentAnimationLegs = string.Empty;
-        private string currentAnimationBody = string.Empty;
-        
-        public string CurrentAnimationBody => currentAnimationBody;
-        public string CurrentAnimationLegs => currentAnimationLegs;
-    
+
         private static readonly int Weapon = Animator.StringToHash("Weapon");
         private static readonly int AttackDirection = Animator.StringToHash("AttackDirection");
 
@@ -33,9 +34,8 @@ namespace Player.Animations
             animator = GetComponent<Animator>();
         }
 
-        public override void FixedUpdateNetwork()
+        public override void Render()
         {
-            if (!FusionUtils.IsLocalPlayer(Object)) return;
             Animate();
         }
 
@@ -43,54 +43,61 @@ namespace Player.Animations
         {
             foreach (var key in animations.Keys)
             {
-                animator.SetBool(key, false);
+                animator.SetBool(animations[key].Name, false);
             }
-            TryPlayAnimation("Body_Idle");
-            TryPlayAnimation("Legs_Idle");
+            TryPlayAnimation(Animations.BodyIdle);
+            TryPlayAnimation(Animations.LegsIdle);
         }
 
         public void AddAnimations(params AnyStateAnimation[] newAnimations)
         {
             foreach (var t in newAnimations)
             {
-                animations.Add(t.Name, t);
+                animations.Add(t.AnimationsEnum, t);
+                ActiveAnimations.Add(t.AnimationsEnum, false);
             }
         }
 
-        public void TryPlayAnimation(string newAnimation)
+        public void TryPlayAnimation(Animations newAnimation)
         {
             var rig = animations[newAnimation].AnimationRig;
             switch (rig)
             {
                 case Rig.Body:
-                    PlayAnimation(ref currentAnimationBody);
+                    PlayAnimation(CurrentAnimationBody);
                     break;
                 case Rig.Legs:
-                    PlayAnimation(ref currentAnimationLegs);
+                    PlayAnimation(CurrentAnimationLegs);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
-            void PlayAnimation(ref string currentAnimation)
+            void PlayAnimation(Animations currentAnimation)
             {
-                if(currentAnimation == "")
+                if(currentAnimation == Animations.None)
                 {
-                    animations[newAnimation].Active = true;
-                    currentAnimation = newAnimation;
+                    ActiveAnimations.Set(currentAnimation, true);
+                    if(rig == Rig.Body)
+                        CurrentAnimationBody = newAnimation;
+                    else
+                        CurrentAnimationLegs = newAnimation;
                 }
                 else if(
                     (currentAnimation != newAnimation 
                      && !animations[newAnimation].HigherPriority.Contains(currentAnimation))
-                    || !animations[currentAnimation].Active
+                    || !ActiveAnimations[currentAnimation]
                     || (!animations[currentAnimation].HoldOnEnd
-                        && animator.GetCurrentAnimatorStateInfo((int)rig).IsName(currentAnimation)
+                        && animator.GetCurrentAnimatorStateInfo((int)rig).IsName(animations[currentAnimation].Name)
                         && animator.GetCurrentAnimatorStateInfo((int)rig).normalizedTime >= 1)
                 )
                 {
-                    animations[currentAnimation].Active = false;
-                    animations[newAnimation].Active = true;
-                    currentAnimation = newAnimation;
+                    ActiveAnimations.Set(currentAnimation, false);
+                    ActiveAnimations.Set(newAnimation, true);
+                    if(rig == Rig.Body)
+                        CurrentAnimationBody = newAnimation;
+                    else
+                        CurrentAnimationLegs = newAnimation;
                 }
             }
         }
@@ -109,19 +116,17 @@ namespace Player.Animations
         {
             foreach (var key in animations.Keys)
             {
-                animator.SetBool(key, animations[key].Active);
+                animator.SetBool(animations[key].Name, (bool)ActiveAnimations[key]);
             }
         }
 
-        public void OnAnimationDone(string doneAnimation)
+        public void OnAnimationDone(Animations doneAnimation)
         {
-            if (!FusionUtils.IsLocalPlayer(Object)) return;
-            animations[doneAnimation].Active = false;
+            ActiveAnimations.Set(doneAnimation, false);
         }
 
         public void OnAnimationTrigger(string startAnimation)
         {
-            if (!FusionUtils.IsLocalPlayer(Object)) return;
             AnimationTriggerEvent?.Invoke(startAnimation);
         }
     }

@@ -1,4 +1,3 @@
-using Animations;
 using Fusion;
 using Gameplay;
 using Photon;
@@ -28,13 +27,17 @@ namespace Player
         
         [SerializeField] private PlayerRespawnController playerRespawnController;
         public PlayerRespawnController PlayerRespawnController => playerRespawnController;
+        
+        [SerializeField] private PlayerVisualController playerVisualController;
+        public PlayerVisualController PlayerVisualController => playerVisualController;
+        
+        [SerializeField] private PlayerState playerState;
+        public PlayerState PlayerState => playerState;
 
         public PlayerActions PlayerActions { get; private set; }
 
         public PlayerUtilities PlayerUtilities { get; private set; }
         
-        public PlayerState PlayerState { get; } = new();
-
         // Start is called before the first frame update
         public override void Spawned()
         {
@@ -79,7 +82,6 @@ namespace Player
             PlayerState.HorizontalInput = Input.GetAxisRaw("Horizontal");
         }
 
-        // Update is called once per frame
         public override void FixedUpdateNetwork()
         {
             if(PlayerState.IsDead) return;
@@ -90,6 +92,7 @@ namespace Player
             PlayerUtilities.HandleEnergy();
             
             PlayerActions.Move();
+            PlayerVisualController.UpdateScaleTransforms();
         }
     }
 }

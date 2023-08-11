@@ -29,7 +29,7 @@ namespace Player
                 player.PlayerReferences.PlayerCanvas.transform.localScale = new Vector3(direction, 1, 1);
                 if (player.PlayerUtilities.IsGrounded)
                 {
-                    player.PlayerAnimations.TryPlayAnimation("Walk");
+                    player.PlayerAnimations.TryPlayAnimation(Animations.Animations.BodyWalk, Animations.Animations.LegsWalk);
                 }
                 if (!player.PlayerComponents.RunAudioSource.isPlaying)
                 {
@@ -38,7 +38,7 @@ namespace Player
             }
             else if(player.PlayerComponents.RigidBody.velocity.magnitude < 0.1f && player.PlayerUtilities.IsGrounded)
             {
-                player.PlayerAnimations.TryPlayAnimation("Idle");
+                player.PlayerAnimations.TryPlayAnimation(Animations.Animations.BodyIdle, Animations.Animations.LegsIdle);
             }
             
             if(!player.PlayerUtilities.IsGrounded || player.PlayerComponents.RigidBody.velocity.magnitude < 0.1f || 
@@ -66,7 +66,7 @@ namespace Player
             }
 
             var speedDiff = targetSpeed - player.PlayerComponents.RigidBody.velocity.x;
-            var accelerationRate = (Mathf.Abs(targetSpeed) > 0.01f || Math.Abs(Mathf.Sign(targetSpeed) - Mathf.Sign(player.PlayerComponents.RigidBody.velocity.x)) < 0.1) 
+            var accelerationRate = Mathf.Abs(targetSpeed) > 0.01f || Math.Abs(Mathf.Sign(targetSpeed) - Mathf.Sign(player.PlayerComponents.RigidBody.velocity.x)) < 0.1
                 ? player.PlayerStats.Acceleration 
                 : player.PlayerStats.Deceleration;
             var movement = Mathf.Pow(Mathf.Abs(speedDiff) * accelerationRate, player.PlayerStats.VelocityPower) * Mathf.Sign(speedDiff);
@@ -77,18 +77,18 @@ namespace Player
         {
             if (player.PlayerUtilities.IsGrounded)
             {
-                player.PlayerAnimations.TryPlayAnimation("Jump");
+                player.PlayerAnimations.TryPlayAnimation(Animations.Animations.BodyJump, Animations.Animations.LegsJump);
             }
             else if(player.PlayerState.CanDoubleJump)
             {
-                player.PlayerAnimations.TryPlayAnimation("Double_Jump");
+                player.PlayerAnimations.TryPlayAnimation(Animations.Animations.BodyDoubleJump, Animations.Animations.LegsDoubleJump);
             }
         }
 
         public void Attack()
         {
             player.PlayerUtilities.TriggerInvincibility(false);
-            player.PlayerAnimations.TryPlayAnimation("Attack");
+            player.PlayerAnimations.TryPlayAnimation(Animations.Animations.BodyAttack, Animations.Animations.LegsAttack);
         }
 
         public void TrySwapWeapon(Global.Weapons weapon)
@@ -97,6 +97,21 @@ namespace Player
             player.PlayerState.Weapon = weapon;
             player.PlayerAnimations.SetWeapon(weapon);
             SwapWeapon();
+        }
+        
+        public void TryShield()
+        {
+            player.PlayerAnimations.TryPlayAnimation(Animations.Animations.BodyShield, Animations.Animations.LegsShield);
+        }
+        
+        public void TryDash()
+        {
+            player.PlayerAnimations.TryPlayAnimation(Animations.Animations.BodyDash, Animations.Animations.LegsDash);
+        }
+        
+        public void TryDodge()
+        {
+            player.PlayerAnimations.TryPlayAnimation(Animations.Animations.BodyDodge, Animations.Animations.LegsDodge);
         }
 
         public void UnEquipWeapons()
@@ -173,19 +188,11 @@ namespace Player
             player.PlayerUtilities.PlayOneShotAudio(player.PlayerReferences.JumpAudioClip);
         }
 
-        public void TryShield()
-        {
-            player.PlayerAnimations.TryPlayAnimation("Shield");
-        }
+        
 
         public void TriggerShield(bool active)
         {
             player.PlayerReferences.PlayerShield.TriggerShield(active);
-        }
-
-        public void TryDodge()
-        {
-            player.PlayerAnimations.TryPlayAnimation("Dodge");
         }
 
         public IEnumerator DodgeCoroutine()
@@ -198,11 +205,6 @@ namespace Player
             player.PlayerUtilities.DodgeEffect(false);
             yield return new WaitForSeconds(0.65f);
             player.PlayerState.CanDodge = true;
-        }
-        
-        public void TryDash()
-        {
-            player.PlayerAnimations.TryPlayAnimation("Dash");
         }
 
         public void Dash()

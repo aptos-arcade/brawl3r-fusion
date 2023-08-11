@@ -16,15 +16,20 @@ namespace Player
 
         private readonly List<Command> commands = new();
         
-        public bool IsOnGround => player.PlayerComponents.FootCollider.IsTouchingLayers(player.PlayerComponents.Ground.value);
-        public bool IsOnPlatform => player.PlayerComponents.FootCollider.IsTouchingLayers(player.PlayerComponents.Platform.value);
+        // public bool IsOnGround => player.PlayerComponents.FootCollider.IsTouchingLayers(player.PlayerComponents.Ground.value);
+        public bool IsOnGround => player.Runner.GetPhysicsScene2D().OverlapBox(
+            player.PlayerReferences.GroundCheck.position, player.PlayerReferences.GroundCheck.localScale, 0,
+            player.PlayerComponents.Ground);
+        public bool IsOnPlatform => player.Runner.GetPhysicsScene2D().OverlapBox(
+            player.PlayerReferences.GroundCheck.position, player.PlayerReferences.GroundCheck.localScale, 0,
+            player.PlayerComponents.Platform);
         public bool IsGrounded => IsOnGround || IsOnPlatform;
         private bool IsFalling => player.PlayerComponents.RigidBody.velocity.y < 0 && !IsGrounded;
         
-        public bool IsDashing => player.PlayerAnimations.IsCurrentBodyAnimation("Dash");
-        public bool IsDodging => player.PlayerAnimations.IsCurrentBodyAnimation("Dodge");
-        public bool IsStunned => player.PlayerAnimations.IsCurrentBodyAnimation("Stunned");
-        public bool IsShielding => player.PlayerAnimations.IsCurrentBodyAnimation("Shield");
+        public bool IsDashing => player.PlayerAnimations.IsCurrentBodyAnimation(Animations.Animations.BodyDash);
+        public bool IsDodging => player.PlayerAnimations.IsCurrentBodyAnimation(Animations.Animations.BodyDodge);
+        public bool IsStunned => player.PlayerAnimations.IsCurrentBodyAnimation(Animations.Animations.BodyStunned);
+        public bool IsShielding => player.PlayerAnimations.IsCurrentBodyAnimation(Animations.Animations.BodyShield);
         
         public bool IsAcceptingInput => !player.PlayerState.IsDead && !player.PlayerState.IsDisabled 
                                                               && MatchManager.Instance.GameState != GameState.MatchOver;
@@ -65,10 +70,10 @@ namespace Player
             if (player.PlayerState.IsDisabled || 
                 !player.Runner.TryGetInputForPlayer<PlayerNetworkInput>(player.Object.InputAuthority, out var input))
                 return;
-            if (IsStunned && Input.anyKeyDown)
-            {
-                player.PlayerAnimations.TryPlayAnimation("Idle");
-            }
+            // if (IsStunned && Input.anyKeyDown)
+            // {
+            //     player.PlayerAnimations.TryPlayAnimation("Idle");
+            // }
 
             if (player.PlayerState.CanMove)
             {
@@ -105,7 +110,7 @@ namespace Player
         {
             if(IsFalling)
             {
-                player.PlayerAnimations.TryPlayAnimation("Fall");
+                player.PlayerAnimations.TryPlayAnimation(Animations.Animations.BodyFall, Animations.Animations.LegsFall);
             }
             if(IsGrounded)
             {
@@ -182,7 +187,7 @@ namespace Player
         {
             if (stunned)
             {
-                player.PlayerAnimations.TryPlayAnimation("Stunned");
+                player.PlayerAnimations.TryPlayAnimation(Animations.Animations.BodyStunned, Animations.Animations.LegsStunned);
             }
             player.PlayerState.IsDisabled = stunned;
             player.PlayerState.CanMove = !stunned;
@@ -256,8 +261,8 @@ namespace Player
             
             player.PlayerComponents.RigidBody.simulated = isRevive;
             
-            player.PlayerState.MeleeEnergy = isRevive ? 0 : 1;
-            player.PlayerState.RangedEnergy = isRevive ? 0 : 1;
+            player.PlayerState.MeleeEnergy = isRevive ? 1 : 0;
+            player.PlayerState.RangedEnergy = isRevive ? 1 : 0;
             
         }
 

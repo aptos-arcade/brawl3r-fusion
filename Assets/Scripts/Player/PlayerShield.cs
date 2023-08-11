@@ -24,10 +24,11 @@ namespace Player
             {
                 gameObject.SetActive(IsActive);
             }
-            if(player.PlayerState.ShieldEnergy <= 0 || !player.PlayerAnimations.IsCurrentBodyAnimation("Shield"))
+            if(player.PlayerState.ShieldEnergy <= 0 || !player.PlayerAnimations.IsCurrentBodyAnimation(Animations.Animations.BodyShield))
             {
                 player.PlayerActions.TriggerShield(false);
-                player.PlayerAnimations.OnAnimationDone("Shield");
+                player.PlayerAnimations.OnAnimationDone(Animations.Animations.BodyShield,
+                    Animations.Animations.LegsShield);
             }
             var scale = 0.1f + 0.9f * player.PlayerState.ShieldEnergy;
             transform.localScale = new Vector3(scale, scale, 1);

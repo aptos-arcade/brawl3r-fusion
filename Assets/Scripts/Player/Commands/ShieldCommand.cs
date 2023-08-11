@@ -29,8 +29,8 @@ namespace Player.Commands
         
         public override void WasReleased()
         {
-            if (!player.PlayerAnimations.IsCurrentBodyAnimation("Shield")) return;
-            player.PlayerAnimations.OnAnimationDone("Shield");
+            if (!player.PlayerAnimations.IsCurrentBodyAnimation(Animations.Animations.BodyShield)) return;
+            player.PlayerAnimations.OnAnimationDone(Animations.Animations.BodyShield, Animations.Animations.LegsShield);
         }
     }
 }

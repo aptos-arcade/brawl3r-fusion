@@ -1,5 +1,4 @@
 using System;
-using Animations;
 using Global;
 using UnityEngine;
 
@@ -14,50 +13,70 @@ namespace Player.Animations
         public void AddAnimations()
         {
             AnyStateAnimation[] animations = {
-                new(Rig.Body, false, "Body_Idle", "Body_Attack", "Body_Jump", "Body_Shield", "Body_Dodge", "Body_Dash"),
-                new(Rig.Body,false, "Body_Walk", "Body_Attack", "Body_Jump", "Body_Shield", "Body_Dodge", "Body_Dash"),
-                new(Rig.Body,false, "Body_Jump", "Body_Attack", "Body_Dodge", "Body_Dash", "Body_Double_Jump"),
-                new(Rig.Body,false, "Body_Double_Jump", "Body_Dodge", "Body_Attack", "Body_FastFall"),
-                new(Rig.Body,false, "Body_Fall", "Body_Attack", "Body_Jump", "Body_Double_Jump", "Body_Shield", "Body_Dodge", "Body_Dash", "Body_FastFall", "Body_Stunned"),
-                new(Rig.Body, false,"Body_Attack", "Body_Shield", "Body_Dodge", "Body_FastFall"),
-                new(Rig.Body,true, "Body_Shield", "Body_Attack", "Body_Jump", "Body_Double_Jump", "Body_Dodge", "Body_Dash", "Body_FastFall"),
-                new(Rig.Body, false,"Body_Dodge", "Body_Attack", "Body_Dash", "Body_FastFall"),
-                new(Rig.Body, false,"Body_Dash", "Body_Attack", "Body_Shield", "Body_Dodge", "Body_FastFall"),
-                new(Rig.Body, true,"Body_FastFall", "Body_Attack"),
-                new(Rig.Body, true, "Body_Stunned"),
+                new(Rig.Body, false, "Body_Idle", Animations.BodyIdle,
+                    Animations.BodyAttack, Animations.BodyJump, Animations.BodyShield, Animations.BodyDodge, Animations.BodyDash),
+                new(Rig.Body,false, "Body_Walk", Animations.BodyWalk,
+                    Animations.BodyAttack, Animations.BodyJump, Animations.BodyShield, Animations.BodyDodge, Animations.BodyDash),
+                new(Rig.Body,false, "Body_Jump", Animations.BodyJump,
+                    Animations.BodyAttack, Animations.BodyDodge, Animations.BodyDash, Animations.BodyDoubleJump),
+                new(Rig.Body,false, "Body_Double_Jump", Animations.BodyDoubleJump,
+                    Animations.BodyDodge, Animations.BodyAttack, Animations.BodyFastFall),
+                new(Rig.Body,false, "Body_Fall", Animations.BodyFall,
+                    Animations.BodyAttack, Animations.BodyJump, Animations.BodyDoubleJump, Animations.BodyShield, Animations.BodyDodge, Animations.BodyDash, Animations.BodyFastFall, Animations.BodyStunned),
+                new(Rig.Body, false,"Body_Attack", Animations.BodyAttack,
+                    Animations.BodyShield, Animations.BodyDodge, Animations.BodyFastFall),
+                new(Rig.Body,true, "Body_Shield", Animations.BodyShield,
+                    Animations.BodyAttack, Animations.BodyJump, Animations.BodyDoubleJump, Animations.BodyDodge, Animations.BodyDash, Animations.BodyFastFall),
+                new(Rig.Body, false,"Body_Dodge", Animations.BodyDodge,
+                    Animations.BodyAttack, Animations.BodyDash, Animations.BodyFastFall),
+                new(Rig.Body, false,"Body_Dash", Animations.BodyDash,
+                    Animations.BodyAttack, Animations.BodyShield, Animations.BodyDodge, Animations.BodyFastFall),
+                new(Rig.Body, true,"Body_FastFall", Animations.BodyFastFall,
+                    Animations.BodyAttack),
+                new(Rig.Body, true, "Body_Stunned", Animations.BodyStunned),
         
-                new(Rig.Legs, false,"Legs_Idle", "Legs_Attack", "Legs_Jump", "Legs_Shield", "Legs_Dodge", "Legs_Dash"),
-                new(Rig.Legs, false,"Legs_Walk", "Legs_Shield", "Legs_Dodge", "Legs_Jump", "Legs_Dash", "Legs_Attack"),
-                new(Rig.Legs, false,"Legs_Jump", "Legs_Double_Jump", "Legs_Dodge", "Legs_Dash"),
-                new(Rig.Legs, false,"Legs_Double_Jump", "Legs_Dodge", "Legs_Attack", "Legs_FastFall"),
-                new(Rig.Legs, false,"Legs_Fall", "Legs_Attack", "Legs_Double_Jump", "Legs_Shield", "Legs_Dodge", "Legs_Dash", "Legs_FastFall", "Legs_Stunned"),
-                new(Rig.Legs, false,"Legs_Attack", "Legs_Shield", "Legs_Dodge", "Legs_FastFall"),
-                new(Rig.Legs, true,"Legs_Shield", "Legs_Attack", "Legs_Jump", "Legs_Double_Jump", "Legs_Dodge", "Legs_Dash", "Legs_FastFall"),
-                new(Rig.Legs, false,"Legs_Dodge", "Legs_Attack", "Legs_Dash", "Legs_FastFall"),
-                new(Rig.Legs, false,"Legs_Dash", "Legs_Attack", "Legs_Shield", "Legs_Dodge", "Legs_FastFall"),
-                new(Rig.Legs, true,"Legs_FastFall", "Legs_Attack"),
-                new(Rig.Legs, true, "Legs_Stunned")
+                new(Rig.Legs, false,"Legs_Idle", Animations.LegsIdle,
+                    Animations.LegsAttack, Animations.LegsJump, Animations.LegsShield, Animations.LegsDodge, Animations.LegsDash),
+                new(Rig.Legs, false,"Legs_Walk", Animations.LegsWalk,
+                    Animations.LegsShield, Animations.LegsDodge, Animations.LegsJump, Animations.LegsDash, Animations.LegsAttack),
+                new(Rig.Legs, false,"Legs_Jump", Animations.LegsJump,
+                    Animations.LegsDoubleJump, Animations.LegsDodge, Animations.LegsDash),
+                new(Rig.Legs, false,"Legs_Double_Jump", Animations.LegsDoubleJump,
+                    Animations.LegsDodge, Animations.LegsAttack, Animations.LegsFastFall),
+                new(Rig.Legs, false,"Legs_Fall", Animations.LegsFall,
+                    Animations.LegsAttack, Animations.LegsDoubleJump, Animations.LegsShield, Animations.LegsDodge, Animations.LegsDash, Animations.LegsFastFall, Animations.LegsStunned),
+                new(Rig.Legs, false,"Legs_Attack", Animations.LegsAttack,
+                    Animations.LegsShield, Animations.LegsDodge, Animations.LegsFastFall),
+                new(Rig.Legs, true,"Legs_Shield", Animations.LegsShield,
+                    Animations.LegsAttack, Animations.LegsJump, Animations.LegsDoubleJump, Animations.LegsDodge, Animations.LegsDash, Animations.LegsFastFall),
+                new(Rig.Legs, false,"Legs_Dodge", Animations.LegsDodge,
+                    Animations.LegsAttack, Animations.LegsDash, Animations.LegsFastFall),
+                new(Rig.Legs, false,"Legs_Dash", Animations.LegsDash,
+                    Animations.LegsAttack, Animations.LegsShield, Animations.LegsDodge, Animations.LegsFastFall),
+                new(Rig.Legs, true,"Legs_FastFall", Animations.LegsFastFall,
+                    Animations.LegsAttack),
+                new(Rig.Legs, true, "Legs_Stunned", Animations.LegsStunned)
             };
         
             animator.AnimationTriggerEvent += HandleAnimation;
             animator.AddAnimations(animations);
         }
 
-        public void TryPlayAnimation(string animation)
+        public void TryPlayAnimation(Animations bodyAnimation, Animations legsAnimation)
         {
-            animator.TryPlayAnimation($"Body_{animation}");
-            animator.TryPlayAnimation($"Legs_{animation}");
+            animator.TryPlayAnimation(bodyAnimation);
+            animator.TryPlayAnimation(legsAnimation);
         }
 
-        public void OnAnimationDone(string animation)
+        public void OnAnimationDone(Animations bodyAnimation, Animations legsAnimation)
         {
-            animator.OnAnimationDone($"Body_{animation}");
-            animator.OnAnimationDone($"Legs_{animation}");
+            animator.OnAnimationDone(bodyAnimation);
+            animator.OnAnimationDone(legsAnimation);
         }
-        
-        public bool IsCurrentBodyAnimation(string animation)
+
+        public bool IsCurrentBodyAnimation(Animations animation)
         {
-            return animator.CurrentAnimationBody == $"Body_{animation}";
+            return animator.CurrentAnimationBody == animation;
         }
 
         public void SetWeapon(Global.Weapons weapon)

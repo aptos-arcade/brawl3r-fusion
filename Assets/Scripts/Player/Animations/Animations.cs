@@ -1,0 +1,29 @@
+namespace Player.Animations
+{
+    public enum Animations
+    {
+        None,
+        BodyIdle,
+        BodyWalk,
+        BodyJump,
+        BodyDoubleJump,
+        BodyFall,
+        BodyAttack,
+        BodyShield,
+        BodyDash,
+        BodyDodge,
+        BodyFastFall,
+        BodyStunned,
+        LegsIdle,
+        LegsWalk,
+        LegsJump,
+        LegsDoubleJump,
+        LegsFall,
+        LegsAttack,
+        LegsShield,
+        LegsDash,
+        LegsDodge,
+        LegsFastFall,
+        LegsStunned
+    }
+}

@@ -1,4 +1,5 @@
 using System;
+using Fusion;
 using UnityEngine;
 
 namespace Player.Commands
@@ -8,7 +9,7 @@ namespace Player.Commands
 
         private readonly PlayerController player;
 
-        private float lastPressTime;
+        private TickTimer dashTimer;
 
         private readonly float direction;
 
@@ -24,12 +25,20 @@ namespace Player.Commands
             if (player.PlayerUtilities.IsDodging) return;
             if (player.PlayerUtilities.IsDashing && Math.Abs(player.transform.localScale.x - direction) > 0.01)
             {
-                player.PlayerAnimations.OnAnimationDone("Dash");
+                player.PlayerAnimations.OnAnimationDone(Animations.Animations.BodyDash, Animations.Animations.LegsDash);
             }
-            var elapsedTime = Time.time - lastPressTime;
-            lastPressTime = Time.time;
-            if (elapsedTime > 0.2f) return;
-            player.PlayerActions.TryDash();
+            
+            Debug.Log(dashTimer.IsRunning);
+
+            if (!dashTimer.ExpiredOrNotRunning(player.Runner))
+            {
+                player.PlayerActions.TryDash();
+                dashTimer = TickTimer.None;
+            }
+            else
+            {
+                dashTimer = TickTimer.CreateFromSeconds(player.Runner, 0.2f);
+            }
         }
     }
 }

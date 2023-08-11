@@ -16,7 +16,7 @@ namespace Weapons
         {
             // get the quaternion of based on the player's local scale
             var rotation = Quaternion.Euler(0, 0, playerController.transform.localScale.x > 0 ? 0 : 180);
-            Runner.Spawn(projectilePrefab, barrelTransform.position, rotation);
+            Runner.Spawn(projectilePrefab, barrelTransform.position, rotation, Object.InputAuthority);
         }
     }
 }

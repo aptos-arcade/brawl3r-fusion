@@ -23,7 +23,7 @@ namespace Player.Commands
             }
             else
             {
-                player.PlayerAnimations.TryPlayAnimation("FastFall");
+                player.PlayerAnimations.TryPlayAnimation(Animations.Animations.BodyFastFall, Animations.Animations.LegsFastFall);
             }
             
             

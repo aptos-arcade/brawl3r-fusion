@@ -46,6 +46,9 @@ namespace Player
         
         [SerializeField] private PlayerShield playerShield;
         public PlayerShield PlayerShield => playerShield;
+        
+        [SerializeField] private Transform groundCheck;
+        public Transform GroundCheck => groundCheck;
 
         [Header("Audio Clips")]
         

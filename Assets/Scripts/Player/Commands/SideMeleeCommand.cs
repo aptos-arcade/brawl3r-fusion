@@ -21,7 +21,7 @@ namespace Player.Commands
         {
             if (player.PlayerState.MeleeEnergy >= player.PlayerStats.SideMeleeAttack.Energy)
             {
-                if (player.PlayerAnimations.IsCurrentBodyAnimation("Attack")) return;
+                if (player.PlayerAnimations.IsCurrentBodyAnimation(Animations.Animations.BodyAttack)) return;
                 player.PlayerReferences.Sword.strikerData = player.PlayerStats.SideMeleeAttack;
 
                 player.gameObject.transform.localScale = new Vector3(xScale, 1, 1);

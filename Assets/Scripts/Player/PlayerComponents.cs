@@ -1,7 +1,4 @@
 using System.Collections.Generic;
-using Com.LuisPedroFonseca.ProCamera2D;
-using Gameplay;
-using Player.Animations;
 using UnityEngine;
 
 namespace Player
@@ -17,9 +14,6 @@ namespace Player
 
         [SerializeField] private CapsuleCollider2D bodyCollider;
         public CapsuleCollider2D BodyCollider { get => bodyCollider; set => bodyCollider = value; }
-
-        // [SerializeField] private AnyStateAnimator animator;
-        // public AnyStateAnimator Animator => animator;
 
         [SerializeField] private LayerMask ground;
         public LayerMask Ground => ground;
