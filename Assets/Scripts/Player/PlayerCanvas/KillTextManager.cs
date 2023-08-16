@@ -2,13 +2,13 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 
-namespace Gameplay
+namespace Player.PlayerCanvas
 {
     public class KillTextManager : MonoBehaviour
     {
         
         [SerializeField] private TMP_Text killText;
-
+        
         public void OnKill()
         {
             StartCoroutine(KillCoroutine());

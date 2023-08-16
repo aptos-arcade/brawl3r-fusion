@@ -60,6 +60,7 @@ namespace Player.Animations
 
         public void TryPlayAnimation(Animations newAnimation)
         {
+            if(!Runner.IsForward) return;
             var rig = animations[newAnimation].AnimationRig;
             switch (rig)
             {
@@ -116,7 +117,7 @@ namespace Player.Animations
         {
             foreach (var key in animations.Keys)
             {
-                animator.SetBool(animations[key].Name, (bool)ActiveAnimations[key]);
+                animator.SetBool(animations[key].Name, ActiveAnimations[key]);
             }
         }
 

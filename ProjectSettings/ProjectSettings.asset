@@ -765,6 +765,7 @@ PlayerSettings:
   webGLPowerPreference: 2
   scriptingDefineSymbols:
     Standalone: FUSION_WEAVER
+    WebGL: FUSION_WEAVER
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}

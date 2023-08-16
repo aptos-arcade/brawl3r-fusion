@@ -15,14 +15,14 @@ namespace Player.Commands
         {
             if (Input.GetAxisRaw("Horizontal") == 0)
             {
-                if (player.PlayerState.ShieldEnergy < 0.1 || !player.PlayerUtilities.IsGrounded) return;
-                player.PlayerActions.TryShield();
+                if (player.PlayerNetworkState.ShieldEnergy < 0.1 || !player.PlayerProperties.IsGrounded) return;
+                player.PlayerAnimations.TryShield();
             }
             else
             {
-                if (player.PlayerUtilities.IsDodging || !player.PlayerState.CanDodge) return;
-                player.PlayerState.Direction = Input.GetAxisRaw("Horizontal") * Vector2.right;
-                player.PlayerActions.TryDodge();
+                if (player.PlayerProperties.IsDodging || !player.PlayerProperties.CanDodge) return;
+                player.PlayerNetworkState.Direction = Input.GetAxisRaw("Horizontal") * Vector2.right;
+                player.PlayerAnimations.TryDodge();
             }
             
         }

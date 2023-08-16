@@ -20,7 +20,7 @@ namespace Photon
 
         private void JoinRoom()
         {
-            NetworkRunnerManager.Instance.JoinRoom(HandleJoin, GameMode.AutoHostOrClient, gameMode, numTeams,
+            NetworkRunnerManager.Instance.JoinRoom(HandleJoin, GameMode.Shared, gameMode, numTeams,
                 numberOfPlayers);
         }
         

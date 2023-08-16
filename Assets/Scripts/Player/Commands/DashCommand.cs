@@ -22,17 +22,15 @@ namespace Player.Commands
 
         public override void WasPressed()
         {
-            if (player.PlayerUtilities.IsDodging) return;
-            if (player.PlayerUtilities.IsDashing && Math.Abs(player.transform.localScale.x - direction) > 0.01)
+            if (player.PlayerProperties.IsDodging) return;
+            if (player.PlayerProperties.IsDashing && Math.Abs(player.transform.localScale.x - direction) > 0.01)
             {
                 player.PlayerAnimations.OnAnimationDone(Animations.Animations.BodyDash, Animations.Animations.LegsDash);
             }
             
-            Debug.Log(dashTimer.IsRunning);
-
             if (!dashTimer.ExpiredOrNotRunning(player.Runner))
             {
-                player.PlayerActions.TryDash();
+                player.PlayerAnimations.TryDash();
                 dashTimer = TickTimer.None;
             }
             else

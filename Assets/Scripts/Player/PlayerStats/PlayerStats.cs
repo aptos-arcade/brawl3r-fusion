@@ -49,9 +49,6 @@ namespace Player.PlayerStats
         [SerializeField] private StrikerData downMeleeAttack;
         public StrikerData DownMeleeAttack => downMeleeAttack;
 
-        [SerializeField] private StrikerData rangedAttack;
-        public StrikerData RangedAttack => rangedAttack;
-
         [Header("Shield")] 
         
         [SerializeField] private float shieldDuration;

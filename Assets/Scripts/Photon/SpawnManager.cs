@@ -5,6 +5,13 @@ namespace Photon
 {
     public class SpawnManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft
     {
+        public static SpawnManager Instance { get; private set; }
+        
+        private void Awake()
+        {
+            Instance = this;
+        }
+
         [SerializeField] private NetworkPrefabRef playerPrefab;
         [SerializeField] private Transform[] spawnPoints;
 
@@ -17,7 +24,7 @@ namespace Photon
             }
         }
 
-        private Vector2 GetSpawnPoint(PlayerRef player)
+        public Vector2 GetSpawnPoint(PlayerRef player)
         {
             return spawnPoints[MatchManager.Instance.SessionPlayers[player].Team].position;
         }

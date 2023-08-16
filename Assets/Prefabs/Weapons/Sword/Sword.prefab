@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 7987665750824427580}
   - component: {fileID: 6145177789492731694}
   - component: {fileID: 4157045767422606419}
-  - component: {fileID: 22447685111542041}
   - component: {fileID: 8105066465955233915}
   m_Layer: 9
   m_Name: Sword
@@ -145,7 +144,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d887ac7d9732c424496d49a3efea3cfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
+  audioSource: {fileID: 7987665750824427580}
 --- !u!114 &4157045767422606419
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -158,7 +157,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66120a01bd5a45a589809313834b7693, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
   strikerData:
     energy: 0
     knockBack: 0
@@ -172,35 +170,11 @@ MonoBehaviour:
   col: {fileID: 8105066465955233915}
   playerLayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 2048
   shieldLayerMask:
     serializedVersion: 2
-    m_Bits: 0
---- !u!114 &22447685111542041
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2727926110774799528}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObjectInterest: 1
-  DefaultInterestGroups: []
-  DestroyWhenStateAuthorityLeaves: 0
-  AllowStateAuthorityOverride: 1
-  AoiPositionSource: {fileID: 0}
-  Flags: 2305
-  NetworkGuid:
-    RawGuidValue: ef7e233cd302148ca82ec28353ecc577
-  NestedObjects: []
-  NetworkedBehaviours:
-  - {fileID: 6145177789492731694}
-  - {fileID: 4157045767422606419}
-  SimulationBehaviours: []
+    m_Bits: 512
+  owner: {fileID: 0}
 --- !u!61 &8105066465955233915
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -211,7 +185,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: -0.0049614906, y: 0.9100443}

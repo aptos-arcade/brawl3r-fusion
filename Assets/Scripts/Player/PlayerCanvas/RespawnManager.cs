@@ -1,17 +1,22 @@
+using Fusion;
+using Player;
 using TMPro;
 using UnityEngine;
+using Utilities;
 
 namespace Gameplay
 {
-    public class RespawnManager : MonoBehaviour
+    public class RespawnManager : SimulationBehaviour
     {
         // references
+        [SerializeField] private PlayerController player;
         [SerializeField] private GameObject respawnPanel;
         [SerializeField] private TMP_Text respawnTimer;
 
-        public void Update()
+        public override void FixedUpdateNetwork()
         {
-            var respawnTime = GameManager.Instance.Player.PlayerRespawnController.RespawnTimer;
+            if (!FusionUtils.IsLocalPlayer(Object)) return;
+            var respawnTime = player.PlayerRespawnController.RespawnTimer;
             if (!respawnTime.IsRunning)
             {
                 respawnPanel.gameObject.SetActive(false);

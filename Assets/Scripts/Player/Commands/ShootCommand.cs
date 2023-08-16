@@ -1,4 +1,3 @@
-using Gameplay;
 using UnityEngine;
 
 namespace Player.Commands
@@ -15,17 +14,7 @@ namespace Player.Commands
 
         public override void WasPressed()
         {
-            if (player.PlayerState.RangedEnergy >= player.PlayerStats.RangedAttack.Energy)
-            {
-                if(player.PlayerAnimations.IsCurrentBodyAnimation(Animations.Animations.BodyAttack)) return;
-                player.PlayerActions.TrySwapWeapon(Global.Weapons.Gun);
-                player.PlayerActions.Attack();
-            }
-            else
-            {
-                GameManager.Instance.NoEnergy(EnergyManager.EnergyType.Gun);
-            }
-            
+            player.PlayerAttacks.Shoot();
         }
     }
 }

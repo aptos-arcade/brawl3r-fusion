@@ -15,5 +15,10 @@ namespace Characters
             
             characters[(int)character].SetActive(true);
         }
+        
+        public GameObject GetCharacter(CharactersEnum character)
+        {
+            return characters[(int)character];
+        }
     }
 }

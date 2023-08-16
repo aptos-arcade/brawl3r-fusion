@@ -1,4 +1,3 @@
-using Gameplay;
 using Global;
 using UnityEngine;
 
@@ -19,24 +18,10 @@ namespace Player.Commands
 
         public override void WasPressed()
         {
-            if (player.PlayerState.MeleeEnergy >= player.PlayerStats.SideMeleeAttack.Energy)
-            {
-                if (player.PlayerAnimations.IsCurrentBodyAnimation(Animations.Animations.BodyAttack)) return;
-                player.PlayerReferences.Sword.strikerData = player.PlayerStats.SideMeleeAttack;
-
-                player.gameObject.transform.localScale = new Vector3(xScale, 1, 1);
-                player.PlayerReferences.PlayerCanvas.transform.localScale = new Vector3(xScale, 1, 1);
-                
-                player.PlayerAnimations.SetAttackDirection(Directions.Side);
-                
-                player.PlayerActions.TrySwapWeapon(Global.Weapons.Sword);
-                player.PlayerActions.Attack();
-            }
-            else
-            {
-                GameManager.Instance.NoEnergy(EnergyManager.EnergyType.Sword);
-            }
-            
+            if (player.PlayerAnimations.IsCurrentBodyAnimation(Animations.Animations.BodyAttack)) return;
+            player.gameObject.transform.localScale = new Vector3(xScale, 1, 1);
+            player.PlayerReferences.PlayerCanvas.transform.localScale = new Vector3(xScale, 1, 1);
+            player.PlayerAttacks.Melee(player.PlayerStats.SideMeleeAttack, Directions.Side);
         }
     }
 }

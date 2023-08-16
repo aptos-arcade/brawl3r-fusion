@@ -370,7 +370,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  destroySeconds: 2
+  destroySeconds: 1
 --- !u!114 &6171973650310628513
 MonoBehaviour:
   m_ObjectHideFlags: 0

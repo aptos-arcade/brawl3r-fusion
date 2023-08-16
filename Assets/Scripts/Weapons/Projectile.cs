@@ -1,4 +1,5 @@
-using Fusion;
+using Player;
+using Player.NetworkBehaviours;
 using UnityEngine;
 
 namespace Weapons
@@ -6,40 +7,30 @@ namespace Weapons
     public class Projectile: Striker
     {
         [SerializeField] private float speed;
-        [SerializeField] private float destroyTime;
-
-        private Vector2 direction;
         
-        [Networked] private TickTimer LifeTimer { get; set; }
-
-        public override void Spawned()
+        private void Start()
         {
-            LifeTimer = TickTimer.CreateFromSeconds(Runner, destroyTime);
+            var directionX = transform.rotation.z > 0 ? -1 : 1;
+            KnockBackSignedDirection = new Vector2(strikerData.KnockBackDirection.x * directionX,
+                strikerData.KnockBackDirection.y);
         }
 
-
-        // Update is called once per frame
         public override void FixedUpdateNetwork()
         {
-            if (!LifeTimer.ExpiredOrNotRunning(Runner))
-            {
-                transform.Translate(transform.right * speed * Runner.DeltaTime, Space.World);
-            }
-
-            if (LifeTimer.Expired(Runner))
-            {
-                Runner.Despawn(Object);
-            }
+            base.FixedUpdateNetwork();
+            transform.Translate(transform.right * speed * Runner.DeltaTime, Space.World);
         }
 
-        private void Destroy()
+        protected override void OnPlayerStrike(Vector2 position, PlayerController player)
         {
+            base.OnPlayerStrike(position, player);
             Runner.Despawn(Object);
         }
-
-        protected override void OnPlayerStrike(Vector2 position)
+        
+        protected override void OnShieldStrike(Vector2 position, PlayerShield shield)
         {
-            Destroy();
+            base.OnShieldStrike(position, shield);
+            Runner.Despawn(Object);
         }
     }
 }

@@ -24,7 +24,10 @@ namespace Photon
         {
             var pings = regions.Select(region => new Ping(region.address)).ToList();
             while (pings.Any(ping => !ping.isDone)) yield return null;
-            var regionPings = pings.Select((t, i) => new RegionPing(regions[i], t.time)).ToList();
+            var regionPings = pings
+                .Select((t, i) => new RegionPing(regions[i], t.time))
+                .Where(region => region.ping != -1)
+                .ToList();
             regionPings.Sort((a, b) => a.ping.CompareTo(b.ping));
             onComplete(regionPings);
         }

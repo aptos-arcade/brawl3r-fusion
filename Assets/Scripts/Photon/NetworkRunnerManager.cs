@@ -67,7 +67,7 @@ namespace Photon
             {
                 if (NetworkRunner.IsServer)
                 {
-                    NetworkRunner.Spawn(matchManagerPrefab, Vector3.zero, Quaternion.identity);
+                    
                 }
                 callback(true);
             }

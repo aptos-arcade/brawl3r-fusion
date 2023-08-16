@@ -22,7 +22,7 @@ namespace MainMenu
 
         private static void JoinTrainingRoom()
         {
-           NetworkRunnerManager.Instance.JoinRoom(HandleJoin, GameMode.Host, 
+           NetworkRunnerManager.Instance.JoinRoom(HandleJoin, GameMode.Shared, 
                Global.GameModes.Training, 1, 1);
         }
 

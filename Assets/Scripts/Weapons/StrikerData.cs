@@ -20,5 +20,8 @@ namespace Weapons
 
         [SerializeField] private float stunTime;
         public float StunTime => stunTime;
+        
+        [SerializeField] private AudioClip audioClip;
+        public AudioClip AudioClip => audioClip;
     }
 }

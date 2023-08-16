@@ -7,7 +7,9 @@ using ApiServices.Models.RankedMatch;
 using Brawler;
 using Characters;
 using Fusion;
+using Gameplay;
 using Global;
+using Player;
 using UnityEngine;
 
 namespace Photon
@@ -39,11 +41,13 @@ namespace Photon
         [Capacity(8)]
         public NetworkArray<PlayerInfo> PlayerInfos { get; }
         
-        [Networked] public string MatchId { get; set; }
+        [Networked] 
+        public GameState GameState { get; private set; } = GameState.Matchmaking;
         
-        [Networked] public GameState GameState { get; set; } = GameState.Matchmaking;
+        [Networked] private string MatchId { get; set; }
         
-        [Networked] public int WinnerIndex { get; set; } = -1;
+        [Networked(OnChanged = nameof(OnWinnerIndexChanged))] 
+        public int WinnerIndex { get; private set; }
         
         // events
 
@@ -72,9 +76,26 @@ namespace Photon
         private static void OnPlayerInfosChanged(Changed<MatchManager> changed)
         {
             PlayerListChanged?.Invoke();
-            if (changed.Behaviour.GameState == GameState.Matchmaking)
+            switch (changed.Behaviour.GameState)
             {
-                changed.Behaviour.TryStartGame();
+                case GameState.Matchmaking:
+                    changed.Behaviour.TryStartGame();
+                    break;
+                case GameState.Playing:
+                    changed.Behaviour.ScoreCheck();
+                    break;
+                case GameState.MatchOver:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private static void OnWinnerIndexChanged(Changed<MatchManager> changed)
+        {
+            if(changed.Behaviour.GameState == GameState.Playing)
+            {
+                GameManager.Instance.EndGame();
             }
         }
         
@@ -123,11 +144,10 @@ namespace Photon
         {
             if (!success)
             {
-                Debug.Log("Failed to create match");
                 OnMatchCreateError?.Invoke();
                 return;
             }
-            Debug.Log($"Match created with id {message}");
+            GameState = GameState.Playing;
             MatchId = message;
             LoadGame();
         }
@@ -137,9 +157,24 @@ namespace Photon
             Runner.SetActiveScene("GameplayScene");
         }
 
-        
 
-        
+        public void OnPlayerDeath(PlayerController player)
+        {
+            var playerRef = player.Object.InputAuthority;
+            
+            // update dead player
+            var playerInfo = PlayerInfos[playerRef];
+            playerInfo.Lives--;
+            PlayerInfos.Set(playerRef, playerInfo);
+            
+            // update killer
+            if (player.PlayerNetworkState.LastStriker != -1)
+            {
+                var strikerInfo = PlayerInfos[player.PlayerNetworkState.LastStriker];
+                strikerInfo.Eliminations++;
+                PlayerInfos.Set(player.PlayerNetworkState.LastStriker, strikerInfo);
+            }
+        }
 
         private void ScoreCheck()
         {
@@ -215,10 +250,10 @@ namespace Photon
     {
         public NetworkString<_16> Name;
         public NetworkString<_64> Id;
-        public CharactersEnum Character;
-        public Swords Sword;
-        public Guns Gun;
-        public int Team;
+        public readonly CharactersEnum Character;
+        public readonly Swords Sword;
+        public readonly Guns Gun;
+        public readonly int Team;
         public int Lives;
         public int Eliminations;
         public NetworkBool IsActive;

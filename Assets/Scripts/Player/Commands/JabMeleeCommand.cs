@@ -1,4 +1,3 @@
-using Gameplay;
 using Global;
 using UnityEngine;
 
@@ -15,35 +14,14 @@ namespace Player.Commands
 
         public override void WasPressed()
         {
-            if (player.PlayerAnimations.IsCurrentBodyAnimation(Animations.Animations.BodyAttack)) return;
-            if (player.PlayerUtilities.IsGrounded)
+            if (player.PlayerProperties.IsGrounded)
             {
-                if (player.PlayerState.MeleeEnergy >= player.PlayerStats.JabMeleeAttack.Energy)
-                {
-                    player.PlayerReferences.Sword.strikerData = player.PlayerStats.JabMeleeAttack;
-                    player.PlayerAnimations.SetAttackDirection(Directions.Neutral);
-                }
-                else
-                {
-                    GameManager.Instance.NoEnergy(EnergyManager.EnergyType.Sword);
-                    return;
-                }
+                player.PlayerAttacks.Melee(player.PlayerStats.JabMeleeAttack, Directions.Neutral);
             }
             else
             {
-                if (player.PlayerState.MeleeEnergy >= player.PlayerStats.DownMeleeAttack.Energy)
-                {
-                    player.PlayerReferences.Sword.strikerData = player.PlayerStats.DownMeleeAttack;
-                    player.PlayerAnimations.SetAttackDirection(Directions.Down);
-                }
-                else
-                {
-                    GameManager.Instance.NoEnergy(EnergyManager.EnergyType.Sword);
-                    return;
-                }
+                player.PlayerAttacks.Melee(player.PlayerStats.DownMeleeAttack, Directions.Down);
             }
-            player.PlayerActions.TrySwapWeapon(Global.Weapons.Sword);
-            player.PlayerActions.Attack();
         }
     }
 }

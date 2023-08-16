@@ -14,16 +14,16 @@ namespace Player.Commands
 
         public override void WasPressed()
         {
-            if (player.PlayerUtilities.IsGrounded)
+            if (player.PlayerProperties.IsGrounded)
             {
-                if (player.PlayerUtilities.IsOnPlatform && !player.PlayerUtilities.IsOnGround)
+                if (player.PlayerProperties.IsOnPlatform && !player.PlayerProperties.IsOnGround)
                 {
-                    player.PlayerActions.Drop();
+                    player.PlayerMovementController.Drop();
                 }
             }
             else
             {
-                player.PlayerAnimations.TryPlayAnimation(Animations.Animations.BodyFastFall, Animations.Animations.LegsFastFall);
+                player.PlayerAnimations.TryFastFall();
             }
             
             

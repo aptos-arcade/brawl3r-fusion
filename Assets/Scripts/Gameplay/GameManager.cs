@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Com.LuisPedroFonseca.ProCamera2D;
@@ -25,60 +26,36 @@ namespace Gameplay
         public ProCamera2D SceneCamera => sceneCamera;
         
         [Header("Managers")]
-        [SerializeField] private RespawnManager respawnManager;
         [SerializeField] private OutOfLivesManager outOfLivesManager;
         [SerializeField] private FeedManager feedManager;
-        [SerializeField] private KillTextManager killTextManager;
         [SerializeField] private ConnectedPlayersManager connectedPlayersManager;
-        [SerializeField] private SpawnManager spawnManager;
-        [SerializeField] private EnergyManager energyManager;
 
         [Header("UI")]
-        [SerializeField] private GameObject energyUI;
         [SerializeField] private GameObject outOfLivesUI;
         [SerializeField] private GameObject winUI;
         [SerializeField] private GameObject loseUI;
 
+        public void OnEnable()
+        {
+            UpdateLeaderboard();
+            MatchManager.PlayerListChanged += UpdateLeaderboard;
+        }
+        
+        public void OnDisable()
+        {
+            MatchManager.PlayerListChanged -= UpdateLeaderboard;
+        }
+
         // handle logic of match manager player infos change
         private void UpdateLeaderboard()
         {
-            var playerInfos = MatchManager.Instance.SessionPlayers.ToList();
-            playerInfos.Sort((a, b) =>
-            {
+            var playerInfos = MatchManager.Instance.SessionPlayers.Where(a => a.IsActive == true).ToList();
+            playerInfos.Sort((a, b) => {
                 var eliminationsComparison = b.Eliminations.CompareTo(a.Eliminations);
                 return eliminationsComparison != 0 ? eliminationsComparison : b.Lives.CompareTo(a.Lives);
             });
             connectedPlayersManager.ListAllPlayers(playerInfos);
         }
-
-        private void PlayerDeathReceive(IReadOnlyList<object> data)
-        {
-            // var actorDeath = (int)data[0];
-            // var actorKill = (int)data[1];
-            //
-            // DeathFeedMessage(actorDeath, actorKill);
-            //
-            // var killPlayerIndex = PlayerInfos.FindIndex(x => x.ActorNumber == actorKill);
-            // if (killPlayerIndex >= 0 && killPlayerIndex < PlayerInfos.Count) PlayerInfos[killPlayerIndex].Eliminations++;
-            // if (actorKill == PhotonNetwork.LocalPlayer.ActorNumber) killTextManager.OnKill();
-            //
-            // var deathPlayerIndex = PlayerInfos.FindIndex(x => x.ActorNumber == actorDeath);
-            // if (deathPlayerIndex >= 0 && deathPlayerIndex < PlayerInfos.Count) PlayerInfos[deathPlayerIndex].Lives--;
-            // if (actorDeath == PhotonNetwork.LocalPlayer.ActorNumber)
-            // {
-            //     if(PlayerInfos[deathPlayerIndex].Lives > 0)
-            //         OnPlayerDeath();
-            //     else
-            //         OnPlayerOutOfLives();
-            // }
-            // ScoreCheck();
-            // ListPlayersSend();
-        }
-
-        // public void SpawnPlayer(PlayerController player)
-        // {
-        //     StartCoroutine(spawnManager.SpawnCoroutine(player));
-        // }
 
         private void DeathFeedMessage(PlayerRef actorDeath, PlayerRef actorKill)
         {
@@ -94,28 +71,13 @@ namespace Gameplay
             }
         }
 
-        // private void OnPlayerDeath()
-        // {
-        //     respawnManager.StartRespawn();
-        // }
-
         private void OnPlayerOutOfLives()
         {
             if(NetworkRunnerManager.Instance.MatchManager.GameState == GameState.MatchOver) return;
             outOfLivesUI.SetActive(true);
         }
-        
-        public void SetEnergyUIActive(bool active)
-        {
-            energyUI.SetActive(active);
-        }
 
-        public void NoEnergy(EnergyManager.EnergyType energyType)
-        {
-            energyManager.NoEnergy(energyType);
-        }
-
-        private void EndGame()
+        public void EndGame()
         {
             if(NetworkRunnerManager.Instance.MatchManager.WinnerIndex == MatchManager.Instance.LocalPlayerInfo.Team)
                 OnWin();

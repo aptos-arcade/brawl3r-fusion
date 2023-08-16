@@ -51,12 +51,12 @@ namespace Gameplay
 
         private void SetRangedEnergy()
         {
-            gunEnergySlider.value = GameManager.Instance.Player.PlayerState.RangedEnergy;
+            gunEnergySlider.value = GameManager.Instance.Player.PlayerNetworkState.RangedEnergy;
         }
 
         private void SetSwordEnergy()
         {
-            swordEnergySlider.value = GameManager.Instance.Player.PlayerState.MeleeEnergy;
+            swordEnergySlider.value = GameManager.Instance.Player.PlayerNetworkState.MeleeEnergy;
         }
 
         public void NoEnergy(EnergyType energyType)

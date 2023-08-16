@@ -14,7 +14,14 @@ namespace Player.Commands
 
         public override void WasPressed()
         {
-            player.PlayerActions.TryJump();
+            if (player.PlayerProperties.IsGrounded)
+            {
+                player.PlayerAnimations.TryJump();
+            }
+            else if(player.PlayerNetworkState.CanDoubleJump)
+            {
+                player.PlayerAnimations.TryDoubleJump();
+            }
         }
     }
 }

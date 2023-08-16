@@ -1,29 +1,42 @@
+using Player;
+using Player.NetworkBehaviours;
 using UnityEngine;
 
 namespace Weapons
 {
     public class Sword : Striker
     {
-        protected override void OnPlayerStrike(Vector2 position)
+        
+        [SerializeField] private PlayerController owner;
+        
+        protected override void OnPlayerStrike(Vector2 position, PlayerController player)
         {
-            base.OnPlayerStrike(position);
+            base.OnPlayerStrike(position, player);
             // StartCoroutine(DisableCoroutine(player));
         }
         
-        // protected override void OnShieldStrike(Vector2 position, PlayerShield shield)
-        // {
-        //     base.OnShieldStrike(position, shield);
-        //     Owner.PlayerUtilities.ShieldHit(shield);
-        // }
-        //
-        // private void Update()
-        // {
-        //     if (!photonView.IsMine) return;
-        //     KnockBackSignedDirection = new Vector2(
-        //         Owner.transform.localScale.x * strikerData.KnockBackDirection.x,
-        //         strikerData.KnockBackDirection.y
-        //     );
-        // }
+        private Weapon SwordWeapon => GetComponent<Weapon>();
+        
+        protected override void OnShieldStrike(Vector2 position, PlayerShield shield)
+        {
+            base.OnShieldStrike(position, shield);
+            owner.PlayerUtilities.ShieldHit(shield);
+        }
+        
+        public override void FixedUpdateNetwork()
+        {
+            KnockBackSignedDirection = new Vector2(
+                owner.transform.localScale.x * strikerData.KnockBackDirection.x,
+                strikerData.KnockBackDirection.y
+            );
+            base.FixedUpdateNetwork();
+        }
+
+        public void Attack()
+        {
+            SwordWeapon.PlaySound(strikerData.AudioClip);
+            owner.PlayerNetworkState.MeleeEnergy -= strikerData.Energy;
+        }
 
         // private static IEnumerator DisableCoroutine(PlayerController player)
         // {

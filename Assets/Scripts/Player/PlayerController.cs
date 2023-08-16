@@ -1,14 +1,17 @@
 using Fusion;
 using Gameplay;
-using Photon;
-using Player.Animations;
+using Player.NetworkBehaviours;
+using Player.PlayerModules;
+using Player.SerializedProperties;
 using UnityEngine;
 using Utilities;
 
 namespace Player
 {
-    public class PlayerController : NetworkBehaviour, IBeforeUpdate
+    public class PlayerController : NetworkBehaviour
     {
+        
+        // serialized fields
 
         [SerializeField] private PlayerStats.PlayerStats playerStats;
         public PlayerStats.PlayerStats PlayerStats => playerStats;
@@ -18,81 +21,77 @@ namespace Player
 
         [SerializeField] private PlayerReferences playerReferences;
         public PlayerReferences PlayerReferences => playerReferences;
-        
-        [SerializeField] private PlayerAnimations playerAnimations;
-        public PlayerAnimations PlayerAnimations => playerAnimations;
-        
-        [SerializeField] private PlayerCameraController playerCameraController;
-        public PlayerCameraController PlayerCameraController => playerCameraController;
-        
-        [SerializeField] private PlayerRespawnController playerRespawnController;
-        public PlayerRespawnController PlayerRespawnController => playerRespawnController;
-        
-        [SerializeField] private PlayerVisualController playerVisualController;
-        public PlayerVisualController PlayerVisualController => playerVisualController;
-        
-        [SerializeField] private PlayerState playerState;
-        public PlayerState PlayerState => playerState;
 
-        public PlayerActions PlayerActions { get; private set; }
+        // components
+
+        public PlayerRespawnController PlayerRespawnController { get; private set; }
+        
+        public PlayerNetworkState PlayerNetworkState { get; private set; }
+        
+        // modules
+
+        public PlayerAttacks PlayerAttacks { get; private set; }
 
         public PlayerUtilities PlayerUtilities { get; private set; }
         
+        public PlayerProperties PlayerProperties { get; private set; }
+        
+        public PlayerVisualController PlayerVisualController { get; private set; }
+        
+        public PlayerMovementController PlayerMovementController { get; private set; }
+        
+        public PlayerAudioController PlayerAudioController { get; private set; }
+        
+        public PlayerAnimations PlayerAnimations { get; private set; }
+
         // Start is called before the first frame update
         public override void Spawned()
         {
-            PlayerActions = new PlayerActions(this);
+            PlayerRespawnController = GetComponent<PlayerRespawnController>();
+            PlayerNetworkState = GetComponent<PlayerNetworkState>();
+            
+            PlayerAttacks = new PlayerAttacks(this);
             PlayerUtilities = new PlayerUtilities(this);
-            
-            playerAnimations.AddAnimations();
-            
-            var playerData = MatchManager.Instance.SessionPlayers[Object.InputAuthority];
-            var tagColor = PlayerUtilities.IsSameTeam(Object)
-            ? new Color(0.6588235f, 0.8078431f, 1f)
-            : Color.red;
-            playerReferences.NameTag.color = tagColor;
-            playerReferences.CollectionTag.color = tagColor;
-            playerReferences.NameTag.text = playerData.Name.ToString();
-            playerReferences.CollectionTag.text =
-            Characters.Characters.AvailableCharacters[playerData.Character].DisplayName;
-            playerReferences.DamageDisplay.text = (PlayerState.DamageMultiplier - 1) * 100 + "%";
-            playerReferences.PlayerShield.SetPlayer(this);
-            
-            playerComponents.RigidBody.gravityScale = playerStats.GravityScale;
+            PlayerProperties = new PlayerProperties(this);
+            PlayerVisualController = new PlayerVisualController(this);
+            PlayerMovementController = new PlayerMovementController(this);
+            PlayerAudioController = new PlayerAudioController(this);
+            PlayerAnimations = new PlayerAnimations(this);
             
             SetLocalObjects();
-            playerRespawnController.StartRespawn();
+
+            if (Runner.IsServer)
+            {
+                PlayerRespawnController.StartRespawn();
+            }
         }
         
         private void SetLocalObjects()
         {
-            if (!FusionUtils.IsLocalPlayer(Object))
-            {
-                GetComponent<NetworkRigidbody2D>().InterpolationDataSource = InterpolationDataSources.Snapshots;
-            }
-            else
+            if(FusionUtils.IsLocalPlayer(Object))
             {
                 GameManager.Instance.Player = this;
             }
-        }
-
-        public void BeforeUpdate()
-        {
-            if(!FusionUtils.IsLocalPlayer(Object) || !PlayerUtilities.IsAcceptingInput) return;
-            PlayerState.HorizontalInput = Input.GetAxisRaw("Horizontal");
+            else
+            {
+                GetComponent<NetworkRigidbody2D>().InterpolationDataSource = InterpolationDataSources.Snapshots;
+            }
         }
 
         public override void FixedUpdateNetwork()
         {
-            if(PlayerState.IsDead) return;
+            if(PlayerNetworkState.IsDead) return;
             
-            PlayerUtilities.HandleInput();
+            PlayerVisualController.HandleVisuals();
+            
+            PlayerUtilities.HandleTimers();
             PlayerUtilities.HandleAir();
             PlayerUtilities.HandleDeath();
             PlayerUtilities.HandleEnergy();
             
-            PlayerActions.Move();
-            PlayerVisualController.UpdateScaleTransforms();
+            PlayerAudioController.HandleAudio();
+            
+            PlayerMovementController.Move();
         }
     }
 }
