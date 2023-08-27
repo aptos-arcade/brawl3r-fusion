@@ -21,8 +21,6 @@ namespace MainMenu
         private void Start()
         {
             backButton.onClick.AddListener(NetworkRunnerManager.Instance.LeaveRoom);
-            if(NetworkRunnerManager.Instance.NetworkRunner.IsServer)
-                ListAllPlayers();
         }
 
         private void OnEnable()

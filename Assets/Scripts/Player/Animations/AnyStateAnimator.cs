@@ -18,7 +18,11 @@ namespace Player.Animations
         [Networked]
         [Capacity(22)]
         private NetworkDictionary<Animations, NetworkBool> ActiveAnimations { get; }
+
+        [Networked] private Global.Weapons Weapon { get; set; }
         
+        [Networked] private Directions AttackDirection { get; set; }
+
         [Networked] public Animations CurrentAnimationBody { get; private set; } = Animations.None;
         
         [Networked] private Animations CurrentAnimationLegs { get; set; } = Animations.None;
@@ -26,8 +30,8 @@ namespace Player.Animations
         public AnimationTriggerEvent AnimationTriggerEvent { get; set; }
 
 
-        private static readonly int Weapon = Animator.StringToHash("Weapon");
-        private static readonly int AttackDirection = Animator.StringToHash("AttackDirection");
+        private static readonly int WeaponHash = Animator.StringToHash("Weapon");
+        private static readonly int AttackDirectionHash = Animator.StringToHash("AttackDirection");
 
         public override void Spawned()
         {
@@ -60,7 +64,7 @@ namespace Player.Animations
 
         public void TryPlayAnimation(Animations newAnimation)
         {
-            if(!Runner.IsForward) return;
+            if(!HasStateAuthority) return;
             var rig = animations[newAnimation].AnimationRig;
             switch (rig)
             {
@@ -103,14 +107,14 @@ namespace Player.Animations
             }
         }
 
-        public void SetWeapon(float weapon)
+        public void SetWeapon(Global.Weapons weapon)
         {
-            animator.SetFloat(Weapon, weapon);
+            Weapon = weapon;
         }
 
         public void SetAttackDirection(Directions direction)
         {
-            animator.SetFloat(AttackDirection, (float)direction);
+            AttackDirection = direction;
         }
 
         private void Animate()
@@ -119,6 +123,8 @@ namespace Player.Animations
             {
                 animator.SetBool(animations[key].Name, ActiveAnimations[key]);
             }
+            animator.SetFloat(WeaponHash, (float)Weapon);
+            animator.SetFloat(AttackDirectionHash, (float)AttackDirection);
         }
 
         public void OnAnimationDone(Animations doneAnimation)

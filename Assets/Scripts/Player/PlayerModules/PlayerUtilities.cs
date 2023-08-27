@@ -3,7 +3,6 @@ using Photon;
 using Player.NetworkBehaviours;
 using UnityEngine;
 using Utilities;
-using Weapons;
 
 namespace Player.PlayerModules
 {
@@ -26,38 +25,42 @@ namespace Player.PlayerModules
 
         public void HandleTimers()
         {
-            if (player.PlayerNetworkState.DropTimer.IsRunning)
+            if (player.PlayerNetworkState.DropTimer.IsRunning 
+                && player.PlayerNetworkState.DropTimer.Expired(player.Runner))
             {
-                if (player.PlayerNetworkState.DropTimer.Expired(player.Runner))
-                {
-                    player.PlayerNetworkState.DropTimer = TickTimer.None;
-                }
+                player.PlayerNetworkState.DropTimer = TickTimer.None;
             }
             
-            if (player.PlayerNetworkState.DodgeCooldown.IsRunning)
+            if (player.PlayerNetworkState.DodgeCooldown.IsRunning 
+                && player.PlayerNetworkState.DodgeCooldown.Expired(player.Runner))
             {
-                if (player.PlayerNetworkState.DodgeCooldown.Expired(player.Runner))
-                {
-                    player.PlayerNetworkState.DodgeCooldown = TickTimer.None;
-                }
+                player.PlayerNetworkState.DodgeCooldown = TickTimer.None;
             }
 
-            if (player.PlayerNetworkState.DodgeTimer.IsRunning)
+            if (player.PlayerNetworkState.DodgeTimer.IsRunning 
+                && player.PlayerNetworkState.DodgeTimer.Expired(player.Runner))
             {
-                if(player.PlayerNetworkState.DodgeTimer.Expired(player.Runner))
-                {
-                    player.PlayerNetworkState.DodgeTimer = TickTimer.None;
-                    player.PlayerComponents.RigidBody.gravityScale = player.PlayerStats.GravityScale;
-                    player.PlayerNetworkState.IsInvincible = false;
-                }
+                player.PlayerNetworkState.DodgeTimer = TickTimer.None;
+                player.PlayerComponents.RigidBody.gravityScale = player.PlayerStats.GravityScale;
+                player.PlayerNetworkState.IsInvincible = false;
             }
             
-            if(player.PlayerNetworkState.StunTimer.IsRunning)
+            if(player.PlayerNetworkState.ShieldStunTimer.IsRunning 
+               && player.PlayerNetworkState.ShieldStunTimer.Expired(player.Runner))
             {
-                if(player.PlayerNetworkState.StunTimer.Expired(player.Runner))
-                {
-                    player.PlayerNetworkState.StunTimer = TickTimer.None;
-                }
+                player.PlayerNetworkState.ShieldStunTimer = TickTimer.None;
+            }
+
+            if (player.PlayerNetworkState.HurtTimer.IsRunning 
+                && player.PlayerNetworkState.HurtTimer.Expired(player.Runner))
+            {
+                player.PlayerNetworkState.HurtTimer = TickTimer.None;
+            }
+
+            if (player.PlayerNetworkState.InvincibleTimer.IsRunning
+                && player.PlayerNetworkState.InvincibleTimer.Expired(player.Runner))
+            {
+                player.PlayerNetworkState.InvincibleTimer = TickTimer.None;
             }
         }
 
@@ -66,16 +69,15 @@ namespace Player.PlayerModules
             if (player.PlayerNetworkState.IsDead || (!(Mathf.Abs(player.transform.position.x) > 30) &&
                                               !(Mathf.Abs(player.transform.position.y) > 16))) return;
 
-            var lostLife = MatchManager.Instance.SessionPlayers[player.Object.InputAuthority].Lives - 1;
-            player.PlayerReferences.PlayerLives.GetChild(lostLife).gameObject.SetActive(false);
-            player.PlayerUtilities.DeathRevive(false);
-            player.PlayerAnimations.OnDeath();
+            // var lostLife = MatchManager.Instance.SessionPlayers[player.Object.InputAuthority].Lives - 1;
+            // player.PlayerReferences.PlayerLives.GetChild(lostLife).gameObject.SetActive(false);
+            OnDeath();
+            
 
-            if (!player.Runner.IsServer) return;
             player.Runner.Spawn(player.PlayerReferences.ExplosionPrefab, player.transform.position, Quaternion.identity);
-            MatchManager.Instance.OnPlayerDeath(player);
+            MatchManager.Instance.RpcOnPlayerDeath(player.Object.InputAuthority, player.PlayerNetworkState.LastStriker);
             player.PlayerNetworkState.LastStriker = -1;
-            player.PlayerNetworkState.StunTimer = TickTimer.None;
+            player.PlayerNetworkState.ShieldStunTimer = TickTimer.None;
             player.PlayerNetworkState.DamageMultiplier = 1;
             player.PlayerRespawnController.StartRespawn();
         }
@@ -96,56 +98,30 @@ namespace Player.PlayerModules
             }
         }
 
-        public void StrikerCollision(Striker striker)
-        {
-            player.PlayerNetworkState.HurtTimer = TickTimer.CreateFromSeconds(player.Runner,
-                striker.strikerData.StunTime * player.PlayerNetworkState.DamageMultiplier);
-            player.PlayerAnimations.TryStunned();
-            PlayerCameraController.ShakeCamera(0.25f, new Vector2(5f, 5f));
-            player.PlayerNetworkState.LastStriker = striker.Object.InputAuthority;
-            player.PlayerNetworkState.DamageMultiplier += striker.strikerData.Damage;
-            player.PlayerComponents.RigidBody.velocity = striker.KnockBackSignedDirection.normalized *
-                                                         striker.strikerData.KnockBack *
-                                                         player.PlayerNetworkState.DamageMultiplier;
-        }
-
-        public void ShieldCollision(Striker striker)
-        {
-            player.PlayerNetworkState.ShieldEnergy -= striker.strikerData.Damage;
-        }
-
         public void ShieldHit(PlayerShield shield)
         {
-            player.PlayerNetworkState.StunTimer = TickTimer.CreateFromSeconds(player.Runner, shield.ShieldStunDuration);
+            player.PlayerNetworkState.ShieldStunTimer = TickTimer.CreateFromSeconds(player.Runner, shield.ShieldStunDuration);
         }
 
-        public void DeathRevive(bool isRevive)
+        public void OnRevive()
         {
-            player.PlayerNetworkState.IsDead = !isRevive;
-            player.PlayerNetworkState.Direction = Vector2.zero;
-            player.PlayerNetworkState.MeleeEnergy = isRevive ? 1 : 0;
-            player.PlayerNetworkState.RangedEnergy = isRevive ? 1 : 0;
+            player.PlayerNetworkState.IsDead = false;
+            player.PlayerNetworkState.MeleeEnergy = 1;
+            player.PlayerNetworkState.RangedEnergy = 1;
+            player.PlayerNetworkState.IsInvincible = true;
+            player.PlayerNetworkState.InvincibleTimer = TickTimer.CreateFromSeconds(player.Runner, 5f);
+        }
+
+        private void OnDeath()
+        {
+            player.PlayerNetworkState.IsDead = true;
             
-            player.PlayerComponents.RigidBody.velocity = Vector2.zero;
-            player.PlayerComponents.RigidBody.simulated = isRevive;
-
-            if (!isRevive)
-            {
-                PlayerCameraController.RemovePlayer(player.transform);
-            }
-
+            player.PlayerAnimations.OnDeath();
+            
             if (FusionUtils.IsLocalPlayer(player.Object))
             {
-                player.PlayerReferences.PlayerCanvasManager.ShowEnergyUi(isRevive);
+                player.PlayerReferences.PlayerCanvasManager.ShowEnergyUi(false);
             }
-            
-            player.PlayerReferences.PlayerObject.SetActive(isRevive);
-        }
-
-        public static bool IsSameTeam(NetworkObject other)
-        {
-            return MatchManager.Instance.SessionPlayers[other.InputAuthority].Team == 
-                   MatchManager.Instance.LocalPlayerInfo.Team;
         }
         
         public void TriggerInvincibility(bool isInvincible)

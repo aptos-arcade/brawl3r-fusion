@@ -13,7 +13,7 @@ namespace ApiServices
         }
         private static readonly string[] Endpoints = {"players", "collections"};
 
-        private static readonly string[] Modes = {"none", "casual", "ranked", "training"};
+        private static readonly string[] Modes = {"casual", "ranked", "training"};
 
         private static string GetEndpoint(GameModes gameMode, LeaderboardEndpoints leaderboardEndpoint, int numDays, 
             int limit, string collectionIdHash)
@@ -93,7 +93,6 @@ namespace ApiServices
                     break;
                 case GameModes.Training:
                     break;
-                case GameModes.None:
                 default:
                     throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
             }

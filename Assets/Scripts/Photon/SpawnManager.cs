@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Photon
 {
-    public class SpawnManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft
+    public class SpawnManager : NetworkBehaviour
     {
         public static SpawnManager Instance { get; private set; }
         
@@ -17,11 +17,7 @@ namespace Photon
 
         public override void Spawned()
         {
-            if(!Runner.IsServer) return;
-            foreach (var player in Runner.ActivePlayers)
-            {
-                SpawnPlayer(player);
-            }
+            SpawnPlayer(Runner.LocalPlayer);
         }
 
         public Vector2 GetSpawnPoint(PlayerRef player)
@@ -31,28 +27,26 @@ namespace Photon
 
         private void SpawnPlayer(PlayerRef player)
         {
-            if(!Runner.IsServer) return;
             var spawnPoint = GetSpawnPoint(player);
             var playerObject = Runner.Spawn(playerPrefab, spawnPoint, Quaternion.identity, player);
             Runner.SetPlayerObject(player, playerObject);
         }
         
-        private void DespawnPlayer(PlayerRef player)
-        {
-            if(!Runner.IsServer) return;
-            if(!Runner.TryGetPlayerObject(player, out var playerObject)) return;
-            Runner.Despawn(playerObject);
-            Runner.SetPlayerObject(player, null);
-        }
+        // private void DespawnPlayer(PlayerRef player)
+        // {
+        //     if(!Runner.TryGetPlayerObject(player, out var playerObject)) return;
+        //     Runner.Despawn(playerObject);
+        //     Runner.SetPlayerObject(player, null);
+        // }
 
-        public void PlayerJoined(PlayerRef player)
-        {
-            SpawnPlayer(player);
-        }
-
-        public void PlayerLeft(PlayerRef player)
-        {
-            DespawnPlayer(player);
-        }
+        // public void PlayerJoined(PlayerRef player)
+        // {
+        //     SpawnPlayer(player);
+        // }
+        //
+        // public void PlayerLeft(PlayerRef player)
+        // {
+        //     DespawnPlayer(player);
+        // }
     }
 }

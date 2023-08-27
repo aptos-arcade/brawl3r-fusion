@@ -22,20 +22,16 @@ namespace Weapons
             base.OnShieldStrike(position, shield);
             owner.PlayerUtilities.ShieldHit(shield);
         }
-        
-        public override void FixedUpdateNetwork()
-        {
-            KnockBackSignedDirection = new Vector2(
-                owner.transform.localScale.x * strikerData.KnockBackDirection.x,
-                strikerData.KnockBackDirection.y
-            );
-            base.FixedUpdateNetwork();
-        }
 
         public void Attack()
         {
             SwordWeapon.PlaySound(strikerData.AudioClip);
             owner.PlayerNetworkState.MeleeEnergy -= strikerData.Energy;
+        }
+        
+        protected override int GetDirection()
+        {
+            return owner.transform.localScale.x > 0 ? 1 : -1;
         }
 
         // private static IEnumerator DisableCoroutine(PlayerController player)

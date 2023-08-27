@@ -6,7 +6,7 @@ namespace ApiServices.Models.CasualMatch
     [Serializable]
     public class SetCasualMatchResultPayload
     {
-        public SetCasualMatchResultPayload(string matchId, int winnerIndex, List<List<CasualMatchPlayer>> teams)
+        public SetCasualMatchResultPayload(string matchId, int winnerIndex, List<CasualMatchTeam> teams)
         {
             this.matchId = matchId;
             this.winnerIndex = winnerIndex;
@@ -15,6 +15,6 @@ namespace ApiServices.Models.CasualMatch
 
         public string matchId;
         public int winnerIndex;
-        public List<List<CasualMatchPlayer>> teams;
+        public List<CasualMatchTeam> teams;
     }
 }

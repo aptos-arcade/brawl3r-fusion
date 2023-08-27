@@ -36,7 +36,7 @@ namespace Player.NetworkBehaviours
 
         public void OnHit(Striker striker)
         {
-            player.PlayerUtilities.ShieldCollision(striker);
+            player.PlayerRpcs.RpcShieldCollision(striker.strikerData.AttackData);
         }
     }
 }

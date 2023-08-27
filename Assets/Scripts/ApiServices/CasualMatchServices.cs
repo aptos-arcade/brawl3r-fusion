@@ -23,7 +23,7 @@ namespace ApiServices
             }, $"match/casual/createMatch", "");
         }
         
-        public static IEnumerator SetMatchResult(string matchId, int winnerIndex, List<List<CasualMatchPlayer>> teams, 
+        public static IEnumerator SetMatchResult(string matchId, int winnerIndex, List<CasualMatchTeam> teams, 
             Action<bool, string> callback)
         {
             yield return ApiClient.PostRequest<SetCasualMatchResultPayload, string>(response =>

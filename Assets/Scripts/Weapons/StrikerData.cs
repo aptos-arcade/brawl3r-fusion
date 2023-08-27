@@ -8,20 +8,11 @@ namespace Weapons
     {
         [SerializeField] private float energy;
         public float Energy => energy;
-        
-        [SerializeField] private float knockBack;
-        public float KnockBack => knockBack;
 
-        [SerializeField] private Vector2 knockBackDirection;
-        public Vector2 KnockBackDirection => knockBackDirection;
-        
-        [SerializeField] private float damage;
-        public float Damage => damage;
-
-        [SerializeField] private float stunTime;
-        public float StunTime => stunTime;
-        
         [SerializeField] private AudioClip audioClip;
         public AudioClip AudioClip => audioClip;
+        
+        [SerializeField] private AttackData attackData;
+        public AttackData AttackData => attackData;
     }
 }

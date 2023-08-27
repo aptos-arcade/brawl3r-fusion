@@ -6,11 +6,11 @@ namespace ApiServices.Models.RankedMatch
     [Serializable]
     public class CreateRankedMatchPayload
     {
-        public CreateRankedMatchPayload(List<List<string>> teams)
+        public CreateRankedMatchPayload(List<CreateRankedMatchTeam> teams)
         {
             this.teams = teams;
         }
         
-        public List<List<string>> teams;
+        public List<CreateRankedMatchTeam> teams;
     }
 }

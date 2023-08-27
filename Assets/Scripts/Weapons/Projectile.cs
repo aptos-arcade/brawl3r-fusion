@@ -7,18 +7,11 @@ namespace Weapons
     public class Projectile: Striker
     {
         [SerializeField] private float speed;
-        
-        private void Start()
-        {
-            var directionX = transform.rotation.z > 0 ? -1 : 1;
-            KnockBackSignedDirection = new Vector2(strikerData.KnockBackDirection.x * directionX,
-                strikerData.KnockBackDirection.y);
-        }
 
         public override void FixedUpdateNetwork()
         {
-            base.FixedUpdateNetwork();
             transform.Translate(transform.right * speed * Runner.DeltaTime, Space.World);
+            Debug.Log(Object);
         }
 
         protected override void OnPlayerStrike(Vector2 position, PlayerController player)
@@ -31,6 +24,11 @@ namespace Weapons
         {
             base.OnShieldStrike(position, shield);
             Runner.Despawn(Object);
+        }
+        
+        protected override int GetDirection()
+        {
+            return transform.rotation.z > 0 ? -1 : 1;
         }
     }
 }

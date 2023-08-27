@@ -6,11 +6,11 @@ namespace ApiServices.Models.CasualMatch
     [Serializable]
     public class CreateCasualMatchPayload
     {
-        public CreateCasualMatchPayload(List<List<CasualMatchPlayer>> teams)
+        public CreateCasualMatchPayload(List<CasualMatchTeam> teams)
         {
             this.teams = teams;
         }
 
-        public List<List<CasualMatchPlayer>> teams;
+        public List<CasualMatchTeam> teams;
     }
 }

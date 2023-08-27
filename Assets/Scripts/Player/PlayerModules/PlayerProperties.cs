@@ -11,15 +11,14 @@ namespace Player.PlayerModules
             this.player = player;
         }
         
-        public bool IsStunned => !player.PlayerNetworkState.StunTimer.ExpiredOrNotRunning(player.Runner);
+        public bool IsStunned => !player.PlayerNetworkState.HurtTimer.ExpiredOrNotRunning(player.Runner)
+            || !player.PlayerNetworkState.ShieldStunTimer.ExpiredOrNotRunning(player.Runner);
         
         public bool IsDodging => !player.PlayerNetworkState.DodgeTimer.ExpiredOrNotRunning(player.Runner);
         
         public bool CanMove => !player.PlayerNetworkState.IsDead && !IsStunned && !IsDodging;
         
         public bool CanDodge => !player.PlayerNetworkState.DodgeCooldown.IsRunning;
-
-        public bool IsDisabled => !player.PlayerNetworkState.StunTimer.ExpiredOrNotRunning(player.Runner);
         
         public bool IsOnGround => player.Runner.GetPhysicsScene2D().OverlapBox(
             player.PlayerReferences.GroundCheck.position, player.PlayerReferences.GroundCheck.localScale, 0,
@@ -36,7 +35,7 @@ namespace Player.PlayerModules
         
         public bool IsShielding => player.PlayerAnimations.IsCurrentBodyAnimation(Animations.Animations.BodyShield);
 
-        public bool IsAcceptingInput => !player.PlayerNetworkState.IsDead && !player.PlayerProperties.IsDisabled
+        public bool IsAcceptingInput => !player.PlayerNetworkState.IsDead && !player.PlayerProperties.IsStunned
                                                                           && MatchManager.Instance.GameState !=
                                                                           GameState.MatchOver;
     }

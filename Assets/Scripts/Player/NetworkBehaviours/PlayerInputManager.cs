@@ -46,14 +46,9 @@ namespace Player.NetworkBehaviours
 
         private void HandleInput()
         {
-            
-            if (player.PlayerProperties.IsDisabled || 
+            if (player.PlayerProperties.IsStunned || 
                 !player.Runner.TryGetInputForPlayer<PlayerNetworkInput>(player.Object.InputAuthority, out var input))
                 return;
-            // if (IsStunned && Input.anyKeyDown)
-            // {
-            //     player.PlayerAnimations.TryPlayAnimation("Idle");
-            // }
 
             if (player.PlayerProperties.CanMove)
             {
@@ -105,15 +100,15 @@ namespace Player.NetworkBehaviours
             input.Set(GetPlayerInput());
         }
         
-        public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {}
+        public void OnPlayerJoined(NetworkRunner runner, PlayerRef playerRef) {}
 
-        public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {}
+        public void OnPlayerLeft(NetworkRunner runner, PlayerRef playerRef) {}
 
-        public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) {}
+        public void OnInputMissing(NetworkRunner runner, PlayerRef playerRef, NetworkInput input) {}
 
         public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) {}
 
-        public void OnConnectedToServer(NetworkRunner runner) {}
+        public void OnConnectedToServer(NetworkRunner networkRunner) {}
 
         public void OnDisconnectedFromServer(NetworkRunner runner) {}
 
@@ -129,7 +124,7 @@ namespace Player.NetworkBehaviours
 
         public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) {}
 
-        public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data) {}
+        public void OnReliableDataReceived(NetworkRunner runner, PlayerRef playerRef, ArraySegment<byte> data) {}
 
         public void OnSceneLoadDone(NetworkRunner runner) {}
 

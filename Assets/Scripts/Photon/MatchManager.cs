@@ -9,7 +9,6 @@ using Characters;
 using Fusion;
 using Gameplay;
 using Global;
-using Player;
 using UnityEngine;
 
 namespace Photon
@@ -60,11 +59,12 @@ namespace Photon
             Instance = this;
             DontDestroyOnLoad(gameObject);
             NetworkRunnerManager.Instance.MatchManager = this;
-            Runner.SetActiveScene("MatchmakingScene");
             RpcAddPlayer(Runner.LocalPlayer,
                 new PlayerInfo(BrawlerManager.Instance.Brawler,
                     Runner.LocalPlayer % SessionNumTeams));
         }
+        
+        // RPCs
         
         [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
         private void RpcAddPlayer(PlayerRef playerRef, PlayerInfo playerInfo)
@@ -72,6 +72,22 @@ namespace Photon
             Debug.Log($"Adding player {playerRef} with name {playerInfo.Name}");
             PlayerInfos.Set(playerRef, playerInfo);
         }
+        
+        [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+        public void RpcOnPlayerDeath(PlayerRef deadPlayer, PlayerRef lastStriker)
+        {
+            // update dead player
+            var playerInfo = PlayerInfos[deadPlayer];
+            playerInfo.Lives--;
+            PlayerInfos.Set(deadPlayer, playerInfo);
+            
+            // update killer
+            if (lastStriker == -1) return;
+            var strikerInfo = PlayerInfos[lastStriker];
+            strikerInfo.Eliminations++;
+            PlayerInfos.Set(lastStriker, strikerInfo);
+        }
+        
         
         private static void OnPlayerInfosChanged(Changed<MatchManager> changed)
         {
@@ -101,7 +117,7 @@ namespace Photon
         
         private void TryStartGame()
         {
-            if (!Runner.IsServer || SessionMaxPlayers != SessionPlayerCount) return;
+            if (!HasStateAuthority || SessionMaxPlayers != SessionPlayerCount) return;
             Runner.SessionInfo.IsOpen = false;
             switch (SessionGameMode)
             {
@@ -129,6 +145,11 @@ namespace Photon
             }
             return teams;
         }
+        
+        private List<CreateRankedMatchTeam> RankedTeamsList()
+        {
+            return TeamsList().Select(team => new CreateRankedMatchTeam(team)).ToList();
+        }
 
         private void CreateCasualMatch()
         {
@@ -137,7 +158,7 @@ namespace Photon
 
         private void CreateRankedMatch()
         {
-            StartCoroutine(RankedMatchServices.CreateMatch(TeamsList(), OnMatchCreated));
+            StartCoroutine(RankedMatchServices.CreateMatch(RankedTeamsList(), OnMatchCreated));
         }
         
         private void OnMatchCreated(bool success, string message)
@@ -157,29 +178,9 @@ namespace Photon
             Runner.SetActiveScene("GameplayScene");
         }
 
-
-        public void OnPlayerDeath(PlayerController player)
-        {
-            var playerRef = player.Object.InputAuthority;
-            
-            // update dead player
-            var playerInfo = PlayerInfos[playerRef];
-            playerInfo.Lives--;
-            PlayerInfos.Set(playerRef, playerInfo);
-            
-            // update killer
-            if (player.PlayerNetworkState.LastStriker != -1)
-            {
-                var strikerInfo = PlayerInfos[player.PlayerNetworkState.LastStriker];
-                strikerInfo.Eliminations++;
-                PlayerInfos.Set(player.PlayerNetworkState.LastStriker, strikerInfo);
-            }
-        }
-
         private void ScoreCheck()
         {
-            if (SessionMaxPlayers == 1 || !NetworkRunnerManager.Instance.NetworkRunner.IsServer ||
-                GameState == GameState.MatchOver) return;
+            if (SessionMaxPlayers == 1 || GameState == GameState.MatchOver) return;
             // check if there is only one team left that has players with more than one life
             var winnerFound = false;
             var curWinningTeam = -1;
@@ -214,7 +215,8 @@ namespace Photon
                             .Add(new CasualMatchPlayer(playerInfo.Id.ToString(), playerInfo.Character, playerInfo.Eliminations));
                     }
 
-                    StartCoroutine(CasualMatchServices.SetMatchResult(MatchId, winnerIndex, casualTeams,
+                    StartCoroutine(CasualMatchServices.SetMatchResult(MatchId, winnerIndex,
+                        casualTeams.Select(team => new CasualMatchTeam(team)).ToList(),
                         OnCasualMatchResultReported));
                     break;
                 case GameModes.Ranked:
@@ -226,7 +228,9 @@ namespace Photon
                         rankedTeams[playerInfo.Team]
                             .Add(new RankedMatchPlayer(playerInfo.Id.ToString(), playerInfo.Character, playerInfo.Eliminations));
                     }
-                    StartCoroutine(RankedMatchServices.SetMatchResult(MatchId, winnerIndex, rankedTeams, OnRankedMatchResultReported));
+                    StartCoroutine(RankedMatchServices.SetMatchResult(MatchId, winnerIndex, 
+                        rankedTeams.Select(team => new RankedMatchTeam(team)).ToList(), 
+                        OnRankedMatchResultReported));
                     break;
                 case GameModes.Training:
                 case GameModes.None:

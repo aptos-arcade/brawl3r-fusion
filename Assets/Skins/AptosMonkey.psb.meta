@@ -389,7 +389,7 @@ ScriptedImporter:
     tessellationDetail: 0
     parentGroupIndex: -1
     uvTransform: {x: 568, y: 809}
-    spritePosition: {x: 689, y: 529}
+    spritePosition: {x: 689, y: 528}
   - name: Right Upper Arm
     originalName: 
     pivot: {x: 0.5, y: 0.5}

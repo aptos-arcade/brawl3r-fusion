@@ -65,10 +65,7 @@ namespace Photon
             var result = await NetworkRunner.StartGame(startGameArgs);
             if (result.Ok)
             {
-                if (NetworkRunner.IsServer)
-                {
-                    
-                }
+                NetworkRunner.SetActiveScene("MatchmakingScene");
                 callback(true);
             }
             else
@@ -116,19 +113,14 @@ namespace Photon
 
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
-            if (!runner.IsServer) return;
             var playerInfo = MatchManager.PlayerInfos[player];
             playerInfo.IsActive = false;
             MatchManager.PlayerInfos.Set(player, playerInfo);
         }
 
-        public void OnInput(NetworkRunner runner, NetworkInput input)
-        {}
+        public void OnInput(NetworkRunner runner, NetworkInput input) {}
 
-        public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
-        {
-            Debug.Log("Input missing");
-        }
+        public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) {}
 
         public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
         {

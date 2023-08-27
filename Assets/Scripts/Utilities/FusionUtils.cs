@@ -1,4 +1,5 @@
 using Fusion;
+using Photon;
 
 namespace Utilities
 {
@@ -6,7 +7,13 @@ namespace Utilities
     {
         public static bool IsLocalPlayer(NetworkObject networkObject)
         {
-            return networkObject.IsValid == networkObject.HasInputAuthority;
+            return networkObject.HasStateAuthority;
+        }
+        
+        public static bool IsSameTeam(NetworkObject other)
+        {
+            return MatchManager.Instance.SessionPlayers[other.InputAuthority].Team == 
+                   MatchManager.Instance.LocalPlayerInfo.Team;
         }
     }
 }

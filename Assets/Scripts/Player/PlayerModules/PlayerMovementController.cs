@@ -16,6 +16,8 @@ namespace Player.PlayerModules
         
         public void Move()
         {
+            if (player.PlayerProperties.IsStunned) return;
+
             float targetSpeed;
             if (player.PlayerProperties.IsDashing)
             {

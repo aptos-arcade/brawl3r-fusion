@@ -9,9 +9,9 @@ namespace ApiServices
     public static class RankedMatchServices
     {
 
-        public static IEnumerator CreateMatch(List<List<string>> teams, Action<bool, string> callback)
+        public static IEnumerator CreateMatch(List<CreateRankedMatchTeam> teams, Action<bool, string> callback)
         {
-            var allPlayers = teams.SelectMany(team => team).ToList();
+            var allPlayers = teams.SelectMany(team => team.players).ToList();
             if (allPlayers.Distinct().Count() != allPlayers.Count)
             {
                 callback(false, "Cannot create match with duplicate players.");
@@ -25,7 +25,7 @@ namespace ApiServices
         }
         
         public static IEnumerator SetMatchResult(string matchAddress, int winnerIndex, 
-            List<List<RankedMatchPlayer>> teams, Action<bool, string> callback)
+            List<RankedMatchTeam> teams, Action<bool, string> callback)
         {
             yield return ApiClient.PostRequest<SetRankedMatchResultPayload, string>(response =>
             {

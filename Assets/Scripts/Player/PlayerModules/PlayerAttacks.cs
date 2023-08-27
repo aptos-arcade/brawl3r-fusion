@@ -45,15 +45,11 @@ namespace Player.PlayerModules
         private void Attack(Global.Weapons weapon)
         {
             player.PlayerUtilities.TriggerInvincibility(false);
-            player.PlayerAttacks.TrySwapWeapon(weapon);
+            if (weapon != player.PlayerNetworkState.Weapon)
+            {
+                player.PlayerNetworkState.Weapon = weapon;
+            }
             player.PlayerAnimations.TryAttack();
-        }
-
-        private void TrySwapWeapon(Global.Weapons weapon)
-        {
-            if(weapon == player.PlayerNetworkState.Weapon) return;
-            player.PlayerNetworkState.Weapon = weapon;
-            SwapWeapon();
         }
 
         public void SwapWeapon()

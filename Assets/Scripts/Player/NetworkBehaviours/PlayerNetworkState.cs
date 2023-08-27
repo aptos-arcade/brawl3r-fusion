@@ -1,5 +1,6 @@
 using Fusion;
 using UnityEngine;
+using Utilities;
 
 namespace Player.NetworkBehaviours
 {
@@ -26,14 +27,16 @@ namespace Player.NetworkBehaviours
         [Networked(OnChanged = nameof(HandleHurtTimerChanged))] 
         public TickTimer HurtTimer { get; set; } = TickTimer.None;
         
-        [Networked] public TickTimer StunTimer { get; set; } = TickTimer.None;
+        [Networked] public TickTimer ShieldStunTimer { get; set; } = TickTimer.None;
         [Networked] public TickTimer DodgeTimer { get; set; } = TickTimer.None;
         
         [Networked(OnChanged = nameof(HandleDropTimerChanged))] 
         public TickTimer DropTimer { get; set; } = TickTimer.None;
         
         [Networked] public TickTimer DodgeCooldown { get; set; } = TickTimer.None;
-
+        
+        [Networked(OnChanged = nameof(HandleInvincibleTimerChanged))]
+        public TickTimer InvincibleTimer { get; set; } = TickTimer.None;
 
         // movement
 
@@ -59,7 +62,8 @@ namespace Player.NetworkBehaviours
         
         [Networked] public NetworkButtons PrevButtons { get; set; }
         
-        [Networked] public NetworkBool IsDead { get; set; } = true;
+        [Networked(OnChanged = nameof(HandleIsDeadChanged))] 
+        public NetworkBool IsDead { get; set; } = true;
         
         // change handlers
         
@@ -80,14 +84,14 @@ namespace Player.NetworkBehaviours
         public static void HandleDamageMultiplierChanged(Changed<PlayerNetworkState> changed)
         {
             changed.Behaviour.player.PlayerReferences.DamageDisplay.text =
-                $"{(changed.Behaviour.player.PlayerNetworkState.DamageMultiplier - 1) * 100}%";
+                $"{((changed.Behaviour.player.PlayerNetworkState.DamageMultiplier - 1) * 100):F0}%";
         }
         
         public static void HandleDropTimerChanged(Changed<PlayerNetworkState> changed)
         {
             changed.Behaviour.player.PlayerComponents.FootCollider.enabled = !changed.Behaviour.DropTimer.IsRunning;
         }
-        
+
         public static void HandleHurtTimerChanged(Changed<PlayerNetworkState> changed)
         {
             if (changed.Behaviour.HurtTimer.IsRunning)
@@ -100,9 +104,38 @@ namespace Player.NetworkBehaviours
             }
         }
         
+        public static void HandleInvincibleTimerChanged(Changed<PlayerNetworkState> changed)
+        {
+            if (!changed.Behaviour.InvincibleTimer.IsRunning)
+            {
+                changed.Behaviour.IsInvincible = false;
+            }
+        }
+        
         public static void HandleIsInvincibleChanged(Changed<PlayerNetworkState> changed)
         {
             changed.Behaviour.player.PlayerVisualController.SetSpriteOpacity(changed.Behaviour.IsInvincible ? 0.5f : 1);
+        }
+
+        public static void HandleIsDeadChanged(Changed<PlayerNetworkState> changed)
+        {
+            var player = changed.Behaviour.player;
+            var isDead = changed.Behaviour.IsDead;
+            
+            player.PlayerReferences.PlayerObject.SetActive(!isDead);
+            
+            player.PlayerComponents.RigidBody.simulated = !isDead;
+            player.PlayerComponents.RigidBody.velocity = Vector2.zero;
+
+            if (!isDead)
+            {
+                player.PlayerVisualController.UpdateLivesDisplay();
+            }
+            
+            if (FusionUtils.IsLocalPlayer(player.Object))
+            {
+                player.PlayerReferences.PlayerCanvasManager.ShowEnergyUi(!isDead);
+            }
         }
     }
 }

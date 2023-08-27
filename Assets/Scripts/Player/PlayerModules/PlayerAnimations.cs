@@ -79,7 +79,7 @@ namespace Player.PlayerModules
 
         public void SetWeapon(Global.Weapons weapon)
         {
-            player.PlayerReferences.Animator.SetWeapon((int)weapon);
+            player.PlayerReferences.Animator.SetWeapon(weapon);
         }
         
         public void SetAttackDirection(Directions attackDirection)

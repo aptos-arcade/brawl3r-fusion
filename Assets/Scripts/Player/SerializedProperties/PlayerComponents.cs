@@ -8,7 +8,7 @@ namespace Player.SerializedProperties
     {
         [SerializeField] private Rigidbody2D rigidBody;
         public Rigidbody2D RigidBody => rigidBody;
-
+        
         [SerializeField] private BoxCollider2D footCollider;
         public BoxCollider2D FootCollider => footCollider;
 

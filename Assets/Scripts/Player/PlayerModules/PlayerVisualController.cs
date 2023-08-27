@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Characters;
 using Photon;
 using UnityEngine;
+using Utilities;
 
 namespace Player.PlayerModules
 {
@@ -22,7 +23,7 @@ namespace Player.PlayerModules
             player.PlayerReferences.GunSprite.SetGun(playerInfo.Gun);
             player.PlayerReferences.SwordSprite.SetSword(playerInfo.Sword);
             
-            var tagColor = PlayerUtilities.IsSameTeam(player.Object)
+            var tagColor = FusionUtils.IsSameTeam(player.Object)
                 ? new Color(0.6588235f, 0.8078431f, 1f)
                 : Color.red;
             player.PlayerReferences.NameTag.color = tagColor;
@@ -85,6 +86,15 @@ namespace Player.PlayerModules
             foreach (var sprite in PlayerSprites)
             {
                 sprite.color = color;
+            }
+        }
+
+        public void UpdateLivesDisplay()
+        {
+            var lives = MatchManager.Instance.SessionPlayers[player.Object.InputAuthority].Lives;
+            for(var i = 0; i < player.PlayerReferences.PlayerLives.childCount; i++)
+            {
+                player.PlayerReferences.PlayerLives.GetChild(i).gameObject.SetActive(i < lives);
             }
         }
     }

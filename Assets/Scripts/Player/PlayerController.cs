@@ -28,6 +28,8 @@ namespace Player
         
         public PlayerNetworkState PlayerNetworkState { get; private set; }
         
+        public PlayerRpcs PlayerRpcs { get; private set; }
+        
         // modules
 
         public PlayerAttacks PlayerAttacks { get; private set; }
@@ -49,6 +51,7 @@ namespace Player
         {
             PlayerRespawnController = GetComponent<PlayerRespawnController>();
             PlayerNetworkState = GetComponent<PlayerNetworkState>();
+            PlayerRpcs = GetComponent<PlayerRpcs>();
             
             PlayerAttacks = new PlayerAttacks(this);
             PlayerUtilities = new PlayerUtilities(this);
@@ -60,10 +63,7 @@ namespace Player
             
             SetLocalObjects();
 
-            if (Runner.IsServer)
-            {
-                PlayerRespawnController.StartRespawn();
-            }
+            PlayerRespawnController.StartRespawn();
         }
         
         private void SetLocalObjects()
@@ -81,14 +81,16 @@ namespace Player
         public override void FixedUpdateNetwork()
         {
             if(PlayerNetworkState.IsDead) return;
-            
-            PlayerVisualController.HandleVisuals();
-            
-            PlayerUtilities.HandleTimers();
-            PlayerUtilities.HandleAir();
-            PlayerUtilities.HandleDeath();
-            PlayerUtilities.HandleEnergy();
-            
+
+            if (HasStateAuthority)
+            {
+                PlayerVisualController.HandleVisuals();
+                PlayerUtilities.HandleTimers();
+                PlayerUtilities.HandleAir();
+                PlayerUtilities.HandleDeath();
+                PlayerUtilities.HandleEnergy();
+            }
+
             PlayerAudioController.HandleAudio();
             
             PlayerMovementController.Move();

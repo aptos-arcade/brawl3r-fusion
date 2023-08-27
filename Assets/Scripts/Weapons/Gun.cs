@@ -16,6 +16,7 @@ namespace Weapons
 
         public void Shoot()
         {
+            if (!HasStateAuthority) return;
             var rotation = Quaternion.Euler(0, 0, playerController.transform.localScale.x > 0 ? 0 : 180);
             Runner.Spawn(projectilePrefab, barrelTransform.position, rotation, Object.InputAuthority);
             GunWeapon.PlaySound(projectilePrefab.strikerData.AudioClip);

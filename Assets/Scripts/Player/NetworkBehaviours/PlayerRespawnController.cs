@@ -14,7 +14,9 @@ namespace Player.NetworkBehaviours
         [SerializeField] private float portalDuration = 2.5f;
         
         [Networked] public TickTimer RespawnTimer { get; private set; }
-        [Networked] private TickTimer PortalTimer { get; set; }
+        
+        [Networked(OnChanged = nameof(HandlePortalTimerChanged))] 
+        private TickTimer PortalTimer { get; set; }
         
         public float RespawnTimerRemaining => RespawnTimer.RemainingTime(Runner) ?? 0;
         
@@ -22,19 +24,14 @@ namespace Player.NetworkBehaviours
 
         public override void FixedUpdateNetwork()
         {
-            if (RespawnTimer.IsRunning)
+            if (!HasStateAuthority) return;
+            if (RespawnTimer.IsRunning && RespawnTimer.Expired(Runner))
             {
-                if (RespawnTimer.Expired(Runner))
-                {
-                    StartPortal();
-                }
+                StartPortal();
             }
-            else if(PortalTimer.IsRunning)
+            else if(PortalTimer.IsRunning && PortalTimer.Expired(Runner))
             {
-                if (PortalTimer.Expired(Runner))
-                {
-                    Respawn();
-                }
+                Respawn();
             }
         }
         
@@ -48,10 +45,8 @@ namespace Player.NetworkBehaviours
         
         private void StartPortal()
         {
-            PlayerCameraController.AddPlayer(playerController.transform);
             RespawnTimer = TickTimer.None;
             PortalTimer = TickTimer.CreateFromSeconds(Runner, portalDuration);
-            if (!Runner.IsServer) return;
             portal = Runner.Spawn(playerController.PlayerReferences.Portal, playerController.transform.position, 
                 Quaternion.identity, playerController.Object.InputAuthority);
         }
@@ -60,7 +55,15 @@ namespace Player.NetworkBehaviours
         {
             Runner.Despawn(portal);
             PortalTimer = TickTimer.None;
-            playerController.PlayerUtilities.DeathRevive(true);
+            playerController.PlayerUtilities.OnRevive();
+        }
+
+        private static void HandlePortalTimerChanged(Changed<PlayerRespawnController> changed)
+        {
+            if (changed.Behaviour.PortalTimer.IsRunning)
+            {
+                PlayerCameraController.AddPlayer(changed.Behaviour.playerController.transform);
+            }
         }
     }
 }

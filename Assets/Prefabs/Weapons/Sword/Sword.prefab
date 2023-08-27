@@ -157,23 +157,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66120a01bd5a45a589809313834b7693, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
   strikerData:
     energy: 0
-    knockBack: 0
-    knockBackDirection: {x: 0, y: 0}
-    damage: 0
-    stunTime: 0
+    audioClip: {fileID: 0}
+    attackData:
+      knockBack: 0
+      damage: 0
+      knockBackDirection: {x: 0, y: 0}
+      stunTime: 0
   playerHitEffect:
     RawGuidValue: 995cd897470d049da82d2dc31b5df2c0
   shieldHitEffect:
     RawGuidValue: 995cd897470d049da82d2dc31b5df2c0
-  col: {fileID: 8105066465955233915}
-  playerLayerMask:
-    serializedVersion: 2
-    m_Bits: 2048
-  shieldLayerMask:
-    serializedVersion: 2
-    m_Bits: 512
+  strikerCollider: {fileID: 8105066465955233915}
   owner: {fileID: 0}
 --- !u!61 &8105066465955233915
 BoxCollider2D:
