@@ -7,12 +7,12 @@ namespace Player.Commands
 
         private readonly PlayerController player;
 
-        public JumpCommand(PlayerController player, KeyCode key) : base(key, InputButtons.Jump)
+        public JumpCommand(PlayerController player, KeyCode key) : base(key)
         {
             this.player = player;
         }
 
-        public override void WasPressed()
+        public override void GetKeyDown()
         {
             if (player.PlayerProperties.IsGrounded)
             {

@@ -9,6 +9,7 @@ using Characters;
 using Fusion;
 using Gameplay;
 using Global;
+using Player.PlayerModules;
 using UnityEngine;
 
 namespace Photon
@@ -43,7 +44,7 @@ namespace Photon
         [Networked] 
         public GameState GameState { get; private set; } = GameState.Matchmaking;
         
-        [Networked] private string MatchId { get; set; }
+        [Networked] private NetworkString<_64> MatchId { get; set; }
         
         [Networked(OnChanged = nameof(OnWinnerIndexChanged))] 
         public int WinnerIndex { get; private set; }
@@ -69,13 +70,20 @@ namespace Photon
         [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
         private void RpcAddPlayer(PlayerRef playerRef, PlayerInfo playerInfo)
         {
-            Debug.Log($"Adding player {playerRef} with name {playerInfo.Name}");
             PlayerInfos.Set(playerRef, playerInfo);
         }
         
-        [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+        [Rpc(RpcSources.All, RpcTargets.All)]
         public void RpcOnPlayerDeath(PlayerRef deadPlayer, PlayerRef lastStriker)
         {
+            GameManager.Instance.DeathFeedMessage(deadPlayer, lastStriker);
+            if (lastStriker == Runner.LocalPlayer)
+            {
+                GameManager.Instance.OnKill();
+            }
+
+            if(!HasStateAuthority) return;
+            
             // update dead player
             var playerInfo = PlayerInfos[deadPlayer];
             playerInfo.Lives--;
@@ -88,7 +96,14 @@ namespace Photon
             PlayerInfos.Set(lastStriker, strikerInfo);
         }
         
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void RpcOnMatchCreateError()
+        {
+            OnMatchCreateError?.Invoke();
+        }
         
+        // change handlers
+
         private static void OnPlayerInfosChanged(Changed<MatchManager> changed)
         {
             PlayerListChanged?.Invoke();
@@ -109,7 +124,7 @@ namespace Photon
 
         private static void OnWinnerIndexChanged(Changed<MatchManager> changed)
         {
-            if(changed.Behaviour.GameState == GameState.Playing)
+            if(changed.Behaviour.GameState == GameState.MatchOver)
             {
                 GameManager.Instance.EndGame();
             }
@@ -135,7 +150,7 @@ namespace Photon
             }
         }
         
-        private List<List<string>> TeamsList()
+        private IEnumerable<List<string>> TeamsList()
         {
             List<List<string>> teams = new();
             for(var i = 0; i < SessionNumTeams; i++) teams.Add(new List<string>());
@@ -165,7 +180,7 @@ namespace Photon
         {
             if (!success)
             {
-                OnMatchCreateError?.Invoke();
+                RpcOnMatchCreateError();
                 return;
             }
             GameState = GameState.Playing;
@@ -209,13 +224,12 @@ namespace Photon
                     var casualTeams = new List<List<CasualMatchPlayer>>();
                     for (var i = 0; i < SessionNumTeams; i++)
                         casualTeams.Add(new List<CasualMatchPlayer>());
-                    foreach (var playerInfo in SessionPlayers)
+                    for(var i = 0; i < SessionMaxPlayers; i++)
                     {
-                        casualTeams[playerInfo.Team]
-                            .Add(new CasualMatchPlayer(playerInfo.Id.ToString(), playerInfo.Character, playerInfo.Eliminations));
+                        casualTeams[SessionPlayers[i].Team]
+                            .Add(new CasualMatchPlayer(SessionPlayers[i].Id.ToString(), SessionPlayers[i].Character, SessionPlayers[i].Eliminations));
                     }
-
-                    StartCoroutine(CasualMatchServices.SetMatchResult(MatchId, winnerIndex,
+                    StartCoroutine(CasualMatchServices.SetMatchResult(MatchId.ToString(), winnerIndex,
                         casualTeams.Select(team => new CasualMatchTeam(team)).ToList(),
                         OnCasualMatchResultReported));
                     break;
@@ -223,12 +237,12 @@ namespace Photon
                     var rankedTeams = new List<List<RankedMatchPlayer>>();
                     for (var i = 0; i < SessionNumTeams; i++)
                         rankedTeams.Add(new List<RankedMatchPlayer>());
-                    foreach (var playerInfo in SessionPlayers)
+                    for (var i = 0; i < SessionMaxPlayers; i++)
                     {
-                        rankedTeams[playerInfo.Team]
-                            .Add(new RankedMatchPlayer(playerInfo.Id.ToString(), playerInfo.Character, playerInfo.Eliminations));
+                        rankedTeams[SessionPlayers[i].Team]
+                            .Add(new RankedMatchPlayer(SessionPlayers[i].Id.ToString(), SessionPlayers[i].Character, SessionPlayers[i].Eliminations));
                     }
-                    StartCoroutine(RankedMatchServices.SetMatchResult(MatchId, winnerIndex, 
+                    StartCoroutine(RankedMatchServices.SetMatchResult(MatchId.ToString(), winnerIndex, 
                         rankedTeams.Select(team => new RankedMatchTeam(team)).ToList(), 
                         OnRankedMatchResultReported));
                     break;

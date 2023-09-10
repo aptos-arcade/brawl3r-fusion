@@ -11,13 +11,13 @@ GameObject:
   - component: {fileID: 4868806120951576}
   - component: {fileID: 198041277572629556}
   - component: {fileID: 199138121272333510}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PortalParticlesDots
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4868806120951576
 Transform:
   m_ObjectHideFlags: 0
@@ -25,14 +25,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1131876395600668}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: -1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3061788583332691546}
   m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 360}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!198 &198041277572629556
 ParticleSystem:
   m_ObjectHideFlags: 0
@@ -748,7 +748,7 @@ ParticleSystem:
     sphericalDirectionAmount: 0
     randomPositionAmount: 0
     radius:
-      value: 4.7491384
+      value: 4.35
       mode: 0
       spread: 0
       speed:
@@ -4849,8 +4849,8 @@ ParticleSystemRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1901336385
+  m_SortingLayer: 3
   m_SortingOrder: 1
   m_RenderMode: 0
   m_MeshDistribution: 0
@@ -4863,7 +4863,7 @@ ParticleSystemRenderer:
   m_SortingFudge: 0
   m_NormalDirection: 1
   m_ShadowBias: 0
-  m_RenderAlignment: 1
+  m_RenderAlignment: 2
   m_Pivot: {x: 0, y: 0, z: 0}
   m_Flip: {x: 0, y: 0, z: 0}
   m_UseCustomVertexStreams: 0
@@ -4893,7 +4893,7 @@ GameObject:
   - component: {fileID: 4167627699112014}
   - component: {fileID: 198392910575384176}
   - component: {fileID: 199265873240239134}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PortalParticlesLines
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4907,14 +4907,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1566550638407094}
-  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3061788583332691546}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!198 &198392910575384176
 ParticleSystem:
   m_ObjectHideFlags: 0
@@ -9673,8 +9673,8 @@ ParticleSystemRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1901336385
+  m_SortingLayer: 3
   m_SortingOrder: 1
   m_RenderMode: 4
   m_MeshDistribution: 0
@@ -9717,7 +9717,7 @@ GameObject:
   - component: {fileID: 4679741661176810}
   - component: {fileID: 4684623839622587373}
   - component: {fileID: 2653888101499394500}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Portal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9754,8 +9754,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ObjectInterest: 1
   DefaultInterestGroups: []
-  DestroyWhenStateAuthorityLeaves: 0
-  AllowStateAuthorityOverride: 1
+  DestroyWhenStateAuthorityLeaves: 1
+  AllowStateAuthorityOverride: 0
   AoiPositionSource: {fileID: 0}
   Flags: 2305
   NetworkGuid:
@@ -9776,7 +9776,7 @@ MonoBehaviour:
   m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
+  _interpolationDataSource: 3
   InterpolationSpace: 0
   InterpolationTarget: {fileID: 3061788583332691546}
   InterpolateErrorCorrection: 1
@@ -9802,7 +9802,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4199252175957324}
   - component: {fileID: 212566389426313772}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PortalBack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9862,8 +9862,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1901336385
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: dbf37bcb477774949bf2d042deea4004, type: 3}
   m_Color: {r: 0.8018868, g: 0.8018868, b: 0.8018868, a: 1}
@@ -9886,7 +9886,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4627561128892146}
   - component: {fileID: 212564267021591710}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Portal01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9902,8 +9902,8 @@ Transform:
   m_GameObject: {fileID: 1994745884973348}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.99, y: 0.99, z: 0.99}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 3061788583332691546}
   m_RootOrder: 1
@@ -9946,8 +9946,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1901336385
+  m_SortingLayer: 3
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 04b0aee4b24684076bb9d14bb555dcc1, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -9970,7 +9970,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3061788583332691546}
   - component: {fileID: 8038241171125788370}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PortalGraphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}

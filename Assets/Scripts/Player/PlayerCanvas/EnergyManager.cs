@@ -1,11 +1,13 @@
 using System;
 using System.Collections;
+using Fusion;
+using Gameplay;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Gameplay
+namespace Player.PlayerCanvas
 {
-    public class EnergyManager : MonoBehaviour
+    public class EnergyManager : SimulationBehaviour
     {
 
         [Header("Gun Energy")]
@@ -43,7 +45,7 @@ namespace Gameplay
             swordEnergyColor = swordEnergyFill.color;
         }
 
-        private void Update()
+        public override void FixedUpdateNetwork()
         {
             SetRangedEnergy();
             SetSwordEnergy();

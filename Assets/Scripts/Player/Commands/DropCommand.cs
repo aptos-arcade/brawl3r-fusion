@@ -7,12 +7,12 @@ namespace Player.Commands
 
         private readonly PlayerController player;
 
-        public DropCommand(PlayerController player, KeyCode key) : base(key, InputButtons.Drop)
+        public DropCommand(PlayerController player, KeyCode key) : base(key)
         {
             this.player = player;
         }
 
-        public override void WasPressed()
+        public override void GetKeyDown()
         {
             if (player.PlayerProperties.IsGrounded)
             {

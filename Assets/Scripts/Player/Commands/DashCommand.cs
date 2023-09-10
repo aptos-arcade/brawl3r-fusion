@@ -13,14 +13,17 @@ namespace Player.Commands
 
         private readonly float direction;
 
-        public DashCommand(PlayerController player, KeyCode key, float direction) : base(key, direction > 0 
-            ? InputButtons.RightDash : InputButtons.LeftDash)
+        private float lastDash;
+
+        private const float dashTime = 0.2f;
+
+        public DashCommand(PlayerController player, KeyCode key, float direction) : base(key)
         {
             this.player = player;
             this.direction = direction;
         }
 
-        public override void WasPressed()
+        public override void GetKeyDown()
         {
             if (player.PlayerProperties.IsDodging) return;
             if (player.PlayerProperties.IsDashing && Math.Abs(player.transform.localScale.x - direction) > 0.01)

@@ -7,12 +7,12 @@ namespace Player.Commands
 
         private readonly PlayerController player;
         
-        public ShootCommand(PlayerController player, KeyCode key) : base(key, InputButtons.Shoot)
+        public ShootCommand(PlayerController player, KeyCode key) : base(key)
         {
             this.player = player;
         }
 
-        public override void WasPressed()
+        public override void GetKeyDown()
         {
             player.PlayerAttacks.Shoot();
         }

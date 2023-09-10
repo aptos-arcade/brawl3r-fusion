@@ -1,3 +1,4 @@
+using Fusion;
 using Player;
 using Player.NetworkBehaviours;
 using UnityEngine;
@@ -11,7 +12,6 @@ namespace Weapons
         public override void FixedUpdateNetwork()
         {
             transform.Translate(transform.right * speed * Runner.DeltaTime, Space.World);
-            Debug.Log(Object);
         }
 
         protected override void OnPlayerStrike(Vector2 position, PlayerController player)

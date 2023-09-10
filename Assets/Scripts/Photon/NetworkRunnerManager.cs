@@ -29,11 +29,10 @@ namespace Photon
         public const string NumTeamsPropKey = "nt";
 
         [SerializeField] private NetworkRunner networkRunnerPrefab;
-        [SerializeField] private MatchManager matchManagerPrefab;
         
         // network properties
-        
-        public NetworkRunner NetworkRunner { get; private set; }
+
+        private NetworkRunner NetworkRunner { get; set; }
         
         public MatchManager MatchManager { get; set; }
 
@@ -98,18 +97,9 @@ namespace Photon
             return appSettings;
         }
 
-        private void OnDisconnect()
-        {
-            NetworkRunner = null;
-            SceneManager.LoadScene("ModeSelectScene");
-        }
-        
         // callbacks
 
-        public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
-        {
-            Debug.Log($"Player {player.PlayerId} joined");
-        }
+        public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {}
 
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
@@ -124,122 +114,30 @@ namespace Photon
 
         public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
         {
-            if (shutdownReason == ShutdownReason.HostMigration) {
-                Debug.Log("Shutdown: Host Migration");
-            } else {
-                Debug.Log("Shutdown: Other");
-                OnDisconnect();
-            }
-        }
-
-        public void OnConnectedToServer(NetworkRunner runner)
-        {
-            Debug.Log("Connected to server with runner arg");
-        }
-
-        public void OnConnectedToServer()
-        {
-            Debug.Log("Connected to server without arg");
-        }
-
-        public void OnDisconnectedFromServer(NetworkRunner runner)
-        {
-            Debug.Log("Disconnected from server");
-            OnDisconnect();
-        }
-
-        public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token)
-        {
-            Debug.Log("Connect request");
-        }
-
-        public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
-        {
-            Debug.Log("Connect failed");
-        }
-
-        public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message)
-        {
-            Debug.Log("User simulation message");
-        }
-
-        public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
-        {
-            Debug.Log("Session list updated");
-        }
-
-        public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data)
-        {
-            Debug.Log("Custom authentication response");
-        }
-
-        public async void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
-        {
-            Debug.Log("Host migration");
-            await runner.Shutdown(shutdownReason: ShutdownReason.HostMigration);
             NetworkRunner = null;
-
-            // Step 2.2
-            // Create a new Runner.
-            NetworkRunner = Instantiate(networkRunnerPrefab);
-
-            // setup the new runner...
-
-            // Start the new Runner using the "HostMigrationToken" and pass a callback ref in "HostMigrationResume".
-            var result = await NetworkRunner.StartGame(new StartGameArgs() {
-                HostMigrationToken = hostMigrationToken,   // contains all necessary info to restart the Runner
-                HostMigrationResume = HostMigrationResume, // this will be invoked to resume the simulation
-                // other args
-            });
-
-            // Check StartGameResult as usual
-            if (result.Ok == false) {
-                Debug.LogWarning(result.ShutdownReason);
-            } else {
-                Debug.Log("Done");
-            }
+            SceneManager.LoadScene("ModeSelectScene");
         }
 
-        private static void HostMigrationResume(NetworkRunner runner) {
+        public void OnConnectedToServer(NetworkRunner runner) {}
+        
+        public void OnDisconnectedFromServer(NetworkRunner runner) {}
 
-            // Get a temporary reference for each NO from the old Host
-            foreach (var resumeNo in runner.GetResumeSnapshotNetworkObjects())
+        public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) {}
 
-                if (
-                    // Extract any NetworkBehavior used to represent the position/rotation of the NetworkObject
-                    // this can be either a NetworkTransform or a NetworkRigidBody, for example
-                    resumeNo.TryGetBehaviour<NetworkPosition>(out var posRot)) {
+        public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) {}
 
-                    runner.Spawn(resumeNo, position: posRot.ReadPosition(), rotation: Quaternion.identity, onBeforeSpawned: (_, newNo) =>
-                    {
-                        // One key aspects of the Host Migration is to have a simple way of restoring the old NetworkObjects state
-                        // If all state of the old NetworkObject is all what is necessary, just call the NetworkObject.CopyStateFrom
-                        newNo.CopyStateFrom(resumeNo);
+        public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) {}
 
-                        // and/or
+        public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) {}
 
-                        // If only partial State is necessary, it is possible to copy it only from specific NetworkBehaviours
-                        if (resumeNo.TryGetBehaviour<NetworkBehaviour>(out var myCustomNetworkBehaviour))
-                        {
-                            newNo.GetComponent<NetworkBehaviour>().CopyStateFrom(myCustomNetworkBehaviour);
-                        }
-                    });
-                }
-        }
+        public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) {}
 
-        public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data)
-        {
-            Debug.Log("Reliable data received");
-        }
+        public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) {}
 
-        public void OnSceneLoadDone(NetworkRunner runner)
-        {
-            Debug.Log("Scene load done");
-        }
+        public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data) {}
 
-        public void OnSceneLoadStart(NetworkRunner runner)
-        {
-            Debug.Log("Scene load start");
-        }
+        public void OnSceneLoadDone(NetworkRunner runner) {}
+
+        public void OnSceneLoadStart(NetworkRunner runner) {}
     }
 }

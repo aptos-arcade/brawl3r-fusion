@@ -1,4 +1,5 @@
 using Fusion;
+using Gameplay;
 using Photon;
 using Player.NetworkBehaviours;
 using UnityEngine;
@@ -51,12 +52,6 @@ namespace Player.PlayerModules
                 player.PlayerNetworkState.ShieldStunTimer = TickTimer.None;
             }
 
-            if (player.PlayerNetworkState.HurtTimer.IsRunning 
-                && player.PlayerNetworkState.HurtTimer.Expired(player.Runner))
-            {
-                player.PlayerNetworkState.HurtTimer = TickTimer.None;
-            }
-
             if (player.PlayerNetworkState.InvincibleTimer.IsRunning
                 && player.PlayerNetworkState.InvincibleTimer.Expired(player.Runner))
             {
@@ -66,20 +61,36 @@ namespace Player.PlayerModules
 
         public void HandleDeath()
         {
-            if (player.PlayerNetworkState.IsDead || (!(Mathf.Abs(player.transform.position.x) > 30) &&
-                                              !(Mathf.Abs(player.transform.position.y) > 16))) return;
-
-            // var lostLife = MatchManager.Instance.SessionPlayers[player.Object.InputAuthority].Lives - 1;
-            // player.PlayerReferences.PlayerLives.GetChild(lostLife).gameObject.SetActive(false);
-            OnDeath();
+            if (player.PlayerNetworkState.IsDead || (!(Mathf.Abs(player.transform.position.x) > 22) &&
+                                              player.transform.position.y is not (> 14 or < -8))) return;
             
-
-            player.Runner.Spawn(player.PlayerReferences.ExplosionPrefab, player.transform.position, Quaternion.identity);
+            player.Runner.Spawn(player.PlayerReferences.ExplosionPrefab, player.transform.position,
+                Quaternion.identity);
+            
+            if (MatchManager.Instance.LocalPlayerInfo.Lives - 1 == 0)
+            {
+                GameManager.Instance.OnPlayerOutOfLives();
+            }
+            else
+            {
+                player.PlayerRespawnController.StartRespawn();
+            }
+            
             MatchManager.Instance.RpcOnPlayerDeath(player.Object.InputAuthority, player.PlayerNetworkState.LastStriker);
+
+            player.PlayerNetworkState.IsDead = true;
             player.PlayerNetworkState.LastStriker = -1;
             player.PlayerNetworkState.ShieldStunTimer = TickTimer.None;
             player.PlayerNetworkState.DamageMultiplier = 1;
-            player.PlayerRespawnController.StartRespawn();
+            
+            player.PlayerAnimations.OnDeath();
+            
+            if (FusionUtils.IsLocalPlayer(player.Object))
+            {
+                player.PlayerReferences.PlayerCanvasManager.ShowEnergyUi(false);
+            }
+            
+            
         }
 
         public void HandleEnergy()
@@ -100,30 +111,22 @@ namespace Player.PlayerModules
 
         public void ShieldHit(PlayerShield shield)
         {
-            player.PlayerNetworkState.ShieldStunTimer = TickTimer.CreateFromSeconds(player.Runner, shield.ShieldStunDuration);
+            player.PlayerNetworkState.ShieldStunTimer =
+                TickTimer.CreateFromSeconds(player.Runner, shield.ShieldStunDuration);
+            player.PlayerAnimations.TryStunned();
         }
 
         public void OnRevive()
         {
             player.PlayerNetworkState.IsDead = false;
+            player.PlayerNetworkState.HurtTimer = TickTimer.None;
             player.PlayerNetworkState.MeleeEnergy = 1;
             player.PlayerNetworkState.RangedEnergy = 1;
             player.PlayerNetworkState.IsInvincible = true;
             player.PlayerNetworkState.InvincibleTimer = TickTimer.CreateFromSeconds(player.Runner, 5f);
+            player.PlayerNetworkState.Weapon = Global.Weapons.Sword;
         }
 
-        private void OnDeath()
-        {
-            player.PlayerNetworkState.IsDead = true;
-            
-            player.PlayerAnimations.OnDeath();
-            
-            if (FusionUtils.IsLocalPlayer(player.Object))
-            {
-                player.PlayerReferences.PlayerCanvasManager.ShowEnergyUi(false);
-            }
-        }
-        
         public void TriggerInvincibility(bool isInvincible)
         {
             if(player.PlayerNetworkState.IsInvincible == isInvincible) return;

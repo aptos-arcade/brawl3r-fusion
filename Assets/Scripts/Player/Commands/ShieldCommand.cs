@@ -6,12 +6,12 @@ namespace Player.Commands
     {
         private readonly PlayerController player;
         
-        public ShieldCommand(PlayerController player, KeyCode key) : base(key, InputButtons.Shield)
+        public ShieldCommand(PlayerController player, KeyCode key) : base(key)
         {
             this.player = player;
         }
 
-        public override void WasHeld()
+        public override void GetKey()
         {
             if (Input.GetAxisRaw("Horizontal") == 0)
             {
@@ -24,10 +24,9 @@ namespace Player.Commands
                 player.PlayerNetworkState.Direction = Input.GetAxisRaw("Horizontal") * Vector2.right;
                 player.PlayerAnimations.TryDodge();
             }
-            
         }
         
-        public override void WasReleased()
+        public override void GetKeyUp()
         {
             if (!player.PlayerAnimations.IsCurrentBodyAnimation(Animations.Animations.BodyShield)) return;
             player.PlayerAnimations.OnAnimationDone(Animations.Animations.BodyShield, Animations.Animations.LegsShield);

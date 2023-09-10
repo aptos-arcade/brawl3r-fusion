@@ -29,12 +29,13 @@ namespace Gameplay
         [SerializeField] private OutOfLivesManager outOfLivesManager;
         [SerializeField] private FeedManager feedManager;
         [SerializeField] private ConnectedPlayersManager connectedPlayersManager;
+        [SerializeField] private KillTextManager killTextManager;
 
         [Header("UI")]
         [SerializeField] private GameObject outOfLivesUI;
         [SerializeField] private GameObject winUI;
         [SerializeField] private GameObject loseUI;
-
+        
         public void OnEnable()
         {
             UpdateLeaderboard();
@@ -44,6 +45,25 @@ namespace Gameplay
         public void OnDisable()
         {
             MatchManager.PlayerListChanged -= UpdateLeaderboard;
+        }
+        
+        public void DeathFeedMessage(PlayerRef actorDeath, PlayerRef actorKill)
+        {
+            var deathPlayerName = MatchManager.Instance.SessionPlayers[actorDeath].Name.ToString();
+            if (actorKill == -1)
+            {
+                feedManager.WriteMessage(deathPlayerName + " died!", 5f);
+            }
+            else
+            {
+                var killPlayerName = MatchManager.Instance.SessionPlayers[actorKill].Name.ToString();
+                feedManager.WriteMessage(killPlayerName + " killed " + deathPlayerName + "!", 5f);
+            }
+        }
+
+        public void OnKill()
+        {
+            killTextManager.OnKill();
         }
 
         // handle logic of match manager player infos change
@@ -57,21 +77,7 @@ namespace Gameplay
             connectedPlayersManager.ListAllPlayers(playerInfos);
         }
 
-        private void DeathFeedMessage(PlayerRef actorDeath, PlayerRef actorKill)
-        {
-            var deathPlayerName = MatchManager.Instance.SessionPlayers[actorDeath].Name.ToString();
-            if (actorKill == 0)
-            {
-                feedManager.WriteMessage(deathPlayerName + " died!", 5f);
-            }
-            else
-            {
-                var killPlayerName = MatchManager.Instance.SessionPlayers[actorDeath].Name.ToString();
-                feedManager.WriteMessage(killPlayerName + " killed " + deathPlayerName + "!", 5f);
-            }
-        }
-
-        private void OnPlayerOutOfLives()
+        public void OnPlayerOutOfLives()
         {
             if(NetworkRunnerManager.Instance.MatchManager.GameState == GameState.MatchOver) return;
             outOfLivesUI.SetActive(true);
@@ -95,6 +101,11 @@ namespace Gameplay
         {
             loseUI.SetActive(true);
             outOfLivesManager.SetOutOfLivesUI(false);
+        }
+
+        public static void LeaveGame()
+        {
+            NetworkRunnerManager.Instance.LeaveRoom();
         }
     }
 }

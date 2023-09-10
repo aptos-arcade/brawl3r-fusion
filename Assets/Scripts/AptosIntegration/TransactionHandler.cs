@@ -47,7 +47,6 @@ namespace AptosIntegration
 
         public static void SendTransactionResult(int success)
         {
-            Debug.Log("Sending transaction result: " + success);
             OnTransactionResult?.Invoke(success > 0);
         }
         

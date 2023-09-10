@@ -49,11 +49,13 @@ namespace Player.PlayerModules
         
         public void HandleVisuals()
         {
+            if(player.PlayerProperties.IsStunned) return;
             if (player.PlayerNetworkState.Direction.x != 0 && player.PlayerProperties.IsGrounded)
             {
                 player.PlayerAnimations.TryWalk();
             }
-            else if(player.PlayerComponents.RigidBody.velocity.magnitude < 0.1f && player.PlayerProperties.IsGrounded)
+            else if(player.PlayerComponents.RigidBody.velocity.magnitude < 0.1f && player.PlayerProperties.IsGrounded || 
+                     Input.anyKey)
             {
                 player.PlayerAnimations.TryIdle();
             }

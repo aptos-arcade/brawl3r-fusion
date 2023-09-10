@@ -14,7 +14,7 @@ namespace ApiServices
         private static string BaseUrl()
         {
             #if UNITY_EDITOR
-                return $"{DevURL}/api/";
+                return $"{ProdURL}/api/";
             #else
                 return $"{ProdURL}/api/";
             #endif

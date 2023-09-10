@@ -48,6 +48,18 @@ namespace Player.SerializedProperties
         
         [SerializeField] private NetworkPrefabRef portal;
         public NetworkPrefabRef Portal => portal;
+        
+        [SerializeField] private NetworkPrefabRef dashEffect;
+        public NetworkPrefabRef DashEffect => dashEffect;
+        
+        [SerializeField] private NetworkPrefabRef jumpEffect;
+        public NetworkPrefabRef JumpEffect => jumpEffect;
+        
+        [SerializeField] private NetworkPrefabRef doubleJumpEffect;
+        public NetworkPrefabRef DoubleJumpEffect => doubleJumpEffect;
+        
+        [SerializeField] private NetworkPrefabRef bloodEffect;
+        public NetworkPrefabRef BloodEffect => bloodEffect;
 
         [Header("Game Objects")] 
         
@@ -56,6 +68,9 @@ namespace Player.SerializedProperties
 
         [SerializeField] private GameObject playerCanvas;
         public GameObject PlayerCanvas => playerCanvas;
+        
+        [SerializeField] private GameObject stunEffect;
+        public GameObject StunEffect => stunEffect;
 
         [Header("Transforms")]
 
@@ -64,6 +79,15 @@ namespace Player.SerializedProperties
 
         [SerializeField] private Transform groundCheck;
         public Transform GroundCheck => groundCheck;
+        
+        [SerializeField] private Transform dashEffectTransform;
+        public Transform DashEffectTransform => dashEffectTransform;
+        
+        [SerializeField] private Transform jumpEffectTransform;
+        public Transform JumpEffectTransform => jumpEffectTransform;
+        
+        [SerializeField] private Transform bloodEffectTransform;
+        public Transform BloodEffectTransform => bloodEffectTransform;
 
         [Header("Audio Clips")]
 

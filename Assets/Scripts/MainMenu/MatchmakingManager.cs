@@ -21,20 +21,15 @@ namespace MainMenu
         private void Start()
         {
             backButton.onClick.AddListener(NetworkRunnerManager.Instance.LeaveRoom);
-        }
-
-        private void OnEnable()
-        {
             MatchManager.PlayerListChanged += ListAllPlayers;
             MatchManager.OnMatchCreateError += OnMatchCreateError;
         }
-        
-        private void OnDisable()
+
+        private void OnDestroy()
         {
             MatchManager.PlayerListChanged -= ListAllPlayers;
             MatchManager.OnMatchCreateError -= OnMatchCreateError;
         }
-
 
         private static string RoomTitle(int numTeams, int numPlayers)
         {
@@ -65,28 +60,26 @@ namespace MainMenu
             {
                 var player = MatchManager.Instance.SessionPlayers[i];
                 if(!player.IsActive) continue;
-                AddPlayer(player);
+                Debug.Log(player.Name);
+                var roomPlayer = Instantiate(roomPlayerPrefab, playersList.transform);
+                roomPlayer.SetPlayerInfo(player.Name.ToString(),
+                    characterImages.GetCharacterSprite((int)player.Character));
+                allPlayers.Add(roomPlayer);
             }
-
-            SetWaitingText();
-        }
-
-        private void AddPlayer(PlayerInfo playerInfo)
-        {
-            var roomPlayer = Instantiate(roomPlayerPrefab, playersList.transform);
-            roomPlayer.SetPlayerInfo(playerInfo.Name.ToString(),
-                characterImages.GetCharacterSprite((int)playerInfo.Character));
-            allPlayers.Add(roomPlayer);
             SetWaitingText();
         }
 
         private void OnMatchCreateError()
         {
             waitingText.text = "Error creating match";
+            Debug.Log(waitingText.text);
+            backButton.interactable = true;
+            Debug.Log(backButton.interactable);
         }
 
         private void SetWaitingText()
         {
+            Debug.Log("Set waiting text");
             var remainingPlayers = MatchManager.Instance.SessionMaxPlayers -
                                    MatchManager.Instance.SessionPlayerCount;
             if (remainingPlayers == 0)
@@ -100,6 +93,7 @@ namespace MainMenu
                 waitingText.text =
                     $"Waiting for {remainingPlayers} player{suffix}...";
             }
+            Debug.Log("Finished waiting text");
         }
     }
 }

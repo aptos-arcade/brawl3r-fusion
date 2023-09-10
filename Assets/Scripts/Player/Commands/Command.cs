@@ -5,18 +5,16 @@ namespace Player.Commands
     public abstract class Command
     {
         public KeyCode Key { get; }
-        public InputButtons Button { get; }
-
-        protected Command(KeyCode key, InputButtons button)
+        
+        protected Command(KeyCode key)
         {
             Key = key;
-            Button = button;
         }
 
-        public virtual void WasPressed() {}
+        public virtual void GetKeyDown() {}
 
-        public virtual void WasHeld() {}
+        public virtual void GetKey() {}
         
-        public virtual void WasReleased() {}
+        public virtual void GetKeyUp() {}
     }
 }

@@ -8,12 +8,12 @@ namespace Player.Commands
         private readonly PlayerController player;
         
 
-        public UpMeleeCommand(PlayerController player, KeyCode key) : base(key, InputButtons.UpMelee)
+        public UpMeleeCommand(PlayerController player, KeyCode key) : base(key)
         {
             this.player = player;
         }
 
-        public override void WasPressed()
+        public override void GetKeyDown()
         {
             player.PlayerAttacks.Melee(player.PlayerStats.UpMeleeAttack, Directions.Up);
         }

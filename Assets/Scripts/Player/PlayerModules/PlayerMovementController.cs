@@ -46,9 +46,17 @@ namespace Player.PlayerModules
         
         public void Jump(bool isDoubleJump)
         {
+            if(!player.HasStateAuthority) return;
             if (isDoubleJump)
             {
                 player.PlayerNetworkState.CanDoubleJump = false;
+                player.Runner.Spawn(player.PlayerReferences.DoubleJumpEffect, 
+                    player.PlayerReferences.JumpEffectTransform.position, Quaternion.identity);
+            }
+            else
+            {
+                player.Runner.Spawn(player.PlayerReferences.JumpEffect, 
+                    player.PlayerReferences.JumpEffectTransform.position, Quaternion.identity);
             }
             var jumpForce = isDoubleJump ? player.PlayerStats.DoubleJumpForce : player.PlayerStats.JumpForce;
             player.PlayerComponents.RigidBody.velocity = new Vector2(player.PlayerComponents.RigidBody.velocity.x, 0);
@@ -64,6 +72,10 @@ namespace Player.PlayerModules
         public void Dash()
         {
             player.PlayerAudioController.PlayOneShotAudio(player.PlayerReferences.DashAudioClip);
+            if(!player.HasStateAuthority) return;
+            player.Runner.Spawn(player.PlayerReferences.DashEffect,
+                player.PlayerReferences.DashEffectTransform.position,
+                player.transform.localScale.x < 0 ? Quaternion.Euler(0, 180, 0) : Quaternion.identity);
         }
         
         public void FastFall()

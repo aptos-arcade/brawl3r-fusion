@@ -34,7 +34,7 @@ namespace Leaderboard
             var characters = Enum.GetValues(typeof(CharactersEnum));
             for (var i = 1; i < characters.Length; i++)
             {
-                var character = (CharactersEnum) characters.GetValue(i);
+                var character = (CharactersEnum)characters.GetValue(i);
                 collectionDropdown.options.Add(new TMP_Dropdown.OptionData(Characters.Characters.GetCharacter(character).DisplayName));
             }
 

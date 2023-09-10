@@ -24,10 +24,6 @@ namespace Photon
                 numberOfPlayers);
         }
         
-        private static void HandleJoin(bool success)
-        {
-            if (success) return;
-            Debug.LogError("Failed to join room");
-        }
+        private static void HandleJoin(bool success) {}
     }
 }

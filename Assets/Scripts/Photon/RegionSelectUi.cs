@@ -28,7 +28,7 @@ namespace Photon
             topRegionsParent.gameObject.SetActive(true);
             allRegionsGameObject.SetActive(false);
             showMoreButton.gameObject.SetActive(false);
-            StartCoroutine(RegionManager.Instance.PingRegions(UpdatePingDisplays));
+            RegionManager.Instance.PingRegions(UpdatePingDisplays);
         }
 
         private void UpdatePingDisplays(List<RegionPing> regionPings)

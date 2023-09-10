@@ -1,9 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Ping = System.Net.NetworkInformation.Ping;
 
 namespace Photon
 {
@@ -20,12 +20,17 @@ namespace Photon
 
         public Region SelectedRegion { get; private set; }
 
-        public IEnumerator PingRegions(Action<List<RegionPing>> onComplete)
+        public void PingRegions(Action<List<RegionPing>> onComplete)
         {
-            var pings = regions.Select(region => new Ping(region.address)).ToList();
-            while (pings.Any(ping => !ping.isDone)) yield return null;
+            Debug.Log("Pinging regions...");
+            var pings = regions.Select(region =>
+            {
+                var ping = new Ping();
+                var pingReply = ping.Send(region.address, 2000);
+                return pingReply?.RoundtripTime ?? -1;
+            }).ToList();
             var regionPings = pings
-                .Select((t, i) => new RegionPing(regions[i], t.time))
+                .Select((t, i) => new RegionPing(regions[i], (int)t))
                 .Where(region => region.ping != -1)
                 .ToList();
             regionPings.Sort((a, b) => a.ping.CompareTo(b.ping));
@@ -43,7 +48,6 @@ namespace Photon
             SelectedRegion = null;
             SceneManager.LoadScene("RegionSelectScene");
         }
-
     }
 
     [Serializable]

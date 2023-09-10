@@ -8,6 +8,8 @@ namespace Player.NetworkBehaviours
     {
         [SerializeField] private PlayerController player;
         
+        [SerializeField] private NetworkPrefabRef shieldOffEffect;
+        
         public float ShieldStunDuration => 
             player.PlayerStats.ShieldStunDuration * 
             transform.localScale.x;
@@ -32,6 +34,9 @@ namespace Player.NetworkBehaviours
         {
             gameObject.SetActive(trigger);
             player.PlayerUtilities.TriggerInvincibility(trigger);
+            if (trigger) return;
+            var shieldOff = Runner.Spawn(shieldOffEffect, transform.position, Quaternion.identity, Object.StateAuthority);
+            shieldOff.transform.localScale = transform.localScale;
         }
 
         public void OnHit(Striker striker)

@@ -245,7 +245,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   networkRunnerPrefab: {fileID: 8013935791448650877, guid: 6b8a8fd15d49d4a2a9f70447727282e5, type: 3}
-  matchManagerPrefab: {fileID: 6195990521265887773, guid: da133a2eda5b24d74a71f1b3da4137f3, type: 3}
 --- !u!1 &180080111
 GameObject:
   m_ObjectHideFlags: 0

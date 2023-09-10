@@ -20,7 +20,6 @@ namespace AptosIntegration
             yield return request.SendWebRequest();
             if (request.result is UnityWebRequest.Result.ConnectionError or UnityWebRequest.Result.ProtocolError)
             {
-                Debug.LogError(request.error);
                 callback("");
             }
             else

@@ -11,12 +11,12 @@ namespace Player.PlayerModules
             this.player = player;
         }
         
-        public bool IsStunned => !player.PlayerNetworkState.HurtTimer.ExpiredOrNotRunning(player.Runner)
-            || !player.PlayerNetworkState.ShieldStunTimer.ExpiredOrNotRunning(player.Runner);
+        public bool IsStunned => player.PlayerNetworkState.HurtTimer.IsRunning
+            || player.PlayerNetworkState.ShieldStunTimer.IsRunning;
         
         public bool IsDodging => !player.PlayerNetworkState.DodgeTimer.ExpiredOrNotRunning(player.Runner);
         
-        public bool CanMove => !player.PlayerNetworkState.IsDead && !IsStunned && !IsDodging;
+        public bool CanMove => !player.PlayerNetworkState.IsDead && !IsStunned && !IsDodging && !IsDashing;
         
         public bool CanDodge => !player.PlayerNetworkState.DodgeCooldown.IsRunning;
         

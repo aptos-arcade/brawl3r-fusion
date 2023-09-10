@@ -1,5 +1,7 @@
 using Gameplay;
 using Global;
+using Player.PlayerCanvas;
+using UnityEngine;
 using Weapons;
 
 namespace Player.PlayerModules

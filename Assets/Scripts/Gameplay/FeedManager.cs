@@ -5,16 +5,11 @@ using UnityEngine;
 
 namespace Gameplay
 {
-    public class FeedManager : MonoBehaviour
+    public class FeedManager : MonoBehaviour, IPlayerJoined, IPlayerLeft
     {
     
         [SerializeField] private TMP_Text feedTextPrefab;
 
-        public void OnPlayerLeftRoom(string playerName)
-        {
-            WriteMessage(playerName + " has left the game", 3f);
-        }
-        
         public void OnDeath(PlayerRef playerDeath, PlayerRef playerKill)
         {
             var deathPlayerName = MatchManager.Instance.SessionPlayers[playerDeath].Name.ToString();
@@ -34,6 +29,16 @@ namespace Gameplay
             var playerText = Instantiate(feedTextPrefab, transform);
             playerText.text = message;
             Destroy(playerText.gameObject, destroyTime);
+        }
+
+        public void PlayerJoined(PlayerRef player)
+        {
+            WriteMessage(MatchManager.Instance.SessionPlayers[player].Name + " has joined the game", 3f);
+        }
+
+        public void PlayerLeft(PlayerRef player)
+        {
+            WriteMessage(MatchManager.Instance.SessionPlayers[player].Name + " has left the game", 3f);
         }
     }
 }

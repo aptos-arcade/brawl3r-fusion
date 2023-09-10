@@ -8,7 +8,7 @@ using Utilities;
 
 namespace Player
 {
-    public class PlayerController : NetworkBehaviour
+    public class PlayerController : NetworkBehaviour, IBeforeUpdate
     {
         
         // serialized fields
@@ -31,6 +31,8 @@ namespace Player
         public PlayerRpcs PlayerRpcs { get; private set; }
         
         // modules
+
+        private PlayerInputController PlayerInputController { get; set; }
 
         public PlayerAttacks PlayerAttacks { get; private set; }
 
@@ -60,6 +62,7 @@ namespace Player
             PlayerMovementController = new PlayerMovementController(this);
             PlayerAudioController = new PlayerAudioController(this);
             PlayerAnimations = new PlayerAnimations(this);
+            PlayerInputController = new PlayerInputController(this);
             
             SetLocalObjects();
 
@@ -78,6 +81,12 @@ namespace Player
             }
         }
 
+        public void BeforeUpdate()
+        {
+            if (!HasStateAuthority) return;
+            PlayerInputController.HandleInput();
+        }
+
         public override void FixedUpdateNetwork()
         {
             if(PlayerNetworkState.IsDead) return;
@@ -94,6 +103,11 @@ namespace Player
             PlayerAudioController.HandleAudio();
             
             PlayerMovementController.Move();
+        }
+
+        public override void Despawned(NetworkRunner runner, bool hasState)
+        {
+            Destroy(gameObject);
         }
     }
 }

@@ -1,4 +1,5 @@
 using Fusion;
+using Player.PlayerModules;
 using UnityEngine;
 using Utilities;
 
@@ -27,7 +28,9 @@ namespace Player.NetworkBehaviours
         [Networked(OnChanged = nameof(HandleHurtTimerChanged))] 
         public TickTimer HurtTimer { get; set; } = TickTimer.None;
         
-        [Networked] public TickTimer ShieldStunTimer { get; set; } = TickTimer.None;
+        [Networked(OnChanged = nameof(HandleShieldStunTimerChanged))] 
+        public TickTimer ShieldStunTimer { get; set; } = TickTimer.None;
+        
         [Networked] public TickTimer DodgeTimer { get; set; } = TickTimer.None;
         
         [Networked(OnChanged = nameof(HandleDropTimerChanged))] 
@@ -47,8 +50,8 @@ namespace Player.NetworkBehaviours
         
         // combat
         
-        [Networked(OnChanged = nameof(HandleWeaponChanged))] 
-        public Global.Weapons Weapon { get; set; } = Global.Weapons.Gun;
+        [Networked(OnChanged = nameof(HandleWeaponChanged))]
+        public Global.Weapons Weapon { get; set; }
         
         [Networked(OnChanged = nameof(HandleDamageMultiplierChanged))] 
         public float DamageMultiplier { get; set; } = 1;
@@ -59,8 +62,6 @@ namespace Player.NetworkBehaviours
         public NetworkBool IsInvincible { get; set; } = false;
         
         // input
-        
-        [Networked] public NetworkButtons PrevButtons { get; set; }
         
         [Networked(OnChanged = nameof(HandleIsDeadChanged))] 
         public NetworkBool IsDead { get; set; } = true;
@@ -101,6 +102,20 @@ namespace Player.NetworkBehaviours
             else
             {
                 changed.Behaviour.player.PlayerVisualController.ResetSpriteColors();
+                changed.Behaviour.player.PlayerReferences.StunEffect.SetActive(false);
+            }
+        }
+        
+        public static void HandleShieldStunTimerChanged(Changed<PlayerNetworkState> changed)
+        {
+            if (changed.Behaviour.ShieldStunTimer.IsRunning)
+            {
+                changed.Behaviour.player.PlayerVisualController.SetSpriteColors(Color.cyan);
+            }
+            else
+            {
+                changed.Behaviour.player.PlayerVisualController.ResetSpriteColors();
+                changed.Behaviour.player.PlayerReferences.StunEffect.SetActive(false);
             }
         }
         
@@ -130,6 +145,10 @@ namespace Player.NetworkBehaviours
             if (!isDead)
             {
                 player.PlayerVisualController.UpdateLivesDisplay();
+            }
+            else
+            {
+                PlayerCameraController.RemovePlayer(player.transform);
             }
             
             if (FusionUtils.IsLocalPlayer(player.Object))

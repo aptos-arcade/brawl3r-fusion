@@ -9,14 +9,13 @@ namespace Player.Commands
 
         private readonly int xScale;
         
-        public SideMeleeCommand(PlayerController player, KeyCode key, int xScale) : base(key, xScale == 1 
-            ? InputButtons.RightSideMelee : InputButtons.LeftSideMelee)
+        public SideMeleeCommand(PlayerController player, KeyCode key, int xScale) : base(key)
         {
             this.player = player;
             this.xScale = xScale;
         }
 
-        public override void WasPressed()
+        public override void GetKeyDown()
         {
             if (player.PlayerAnimations.IsCurrentBodyAnimation(Animations.Animations.BodyAttack)) return;
             player.gameObject.transform.localScale = new Vector3(xScale, 1, 1);

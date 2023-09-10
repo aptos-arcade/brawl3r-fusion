@@ -20,7 +20,7 @@ namespace Player.NetworkBehaviours
         {
             if (player.PlayerNetworkState.IsInvincible
                 || player.PlayerNetworkState.InvincibleTimer.IsRunning) return;
-            
+
             player.PlayerNetworkState.HurtTimer = TickTimer.CreateFromSeconds(player.Runner,
                 attackData.stunTime * player.PlayerNetworkState.DamageMultiplier);
             player.PlayerNetworkState.LastStriker = striker;
@@ -33,6 +33,9 @@ namespace Player.NetworkBehaviours
                 attackData.knockBack * player.PlayerNetworkState.DamageMultiplier;
             
             player.PlayerAnimations.TryStunned();
+            
+            player.Runner.Spawn(player.PlayerReferences.BloodEffect,
+                player.PlayerReferences.BloodEffectTransform.position, Quaternion.identity);
             
             PlayerCameraController.ShakeCamera(0.25f, new Vector2(5f, 5f));
         }

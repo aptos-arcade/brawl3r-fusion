@@ -7,12 +7,12 @@ namespace Player.Commands
     {
         private readonly PlayerController player;
         
-        public JabMeleeCommand(PlayerController player, KeyCode key) : base(key, InputButtons.JabMelee)
+        public JabMeleeCommand(PlayerController player, KeyCode key) : base(key)
         {
             this.player = player;
         }
 
-        public override void WasPressed()
+        public override void GetKeyDown()
         {
             if (player.PlayerProperties.IsGrounded)
             {

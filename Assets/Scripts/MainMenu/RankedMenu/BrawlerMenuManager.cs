@@ -48,7 +48,6 @@ namespace MainMenu.RankedMenu
 
         private void HandleFetchBrawlerAddress(BrawlerAddress brawlerAddress)
         {
-            Debug.Log(brawlerAddress.address);
             playerHasBrawler = brawlerAddress.address != string.Empty;
             loadingText.gameObject.SetActive(false);
             if (playerHasBrawler)

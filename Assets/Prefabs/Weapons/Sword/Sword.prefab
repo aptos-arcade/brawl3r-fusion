@@ -167,9 +167,9 @@ MonoBehaviour:
       knockBackDirection: {x: 0, y: 0}
       stunTime: 0
   playerHitEffect:
-    RawGuidValue: 995cd897470d049da82d2dc31b5df2c0
+    RawGuidValue: 6ae28b34f176d4aa8892368b9d6a0f77
   shieldHitEffect:
-    RawGuidValue: 995cd897470d049da82d2dc31b5df2c0
+    RawGuidValue: 70c4e92b8e72f46eb9bfb4074db34611
   strikerCollider: {fileID: 8105066465955233915}
   owner: {fileID: 0}
 --- !u!61 &8105066465955233915

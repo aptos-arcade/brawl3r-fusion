@@ -17,13 +17,13 @@ TagManager:
   - Shield
   - Feet
   - PlayerHitbox
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Parallax0
+  - Parallax1
+  - Parallax2
+  - Parallax3
+  - Parallax4
+  - Parallax5
+  - Parallax6
   - 
   - 
   - 
@@ -40,4 +40,13 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 1441165303
+    locked: 0
+  - name: Platforms
+    uniqueID: 2418014669
+    locked: 0
+  - name: Player
+    uniqueID: 2393630911
     locked: 0

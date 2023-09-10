@@ -99,10 +99,12 @@ namespace Player.Animations
                 {
                     ActiveAnimations.Set(currentAnimation, false);
                     ActiveAnimations.Set(newAnimation, true);
+
                     if(rig == Rig.Body)
                         CurrentAnimationBody = newAnimation;
                     else
                         CurrentAnimationLegs = newAnimation;
+                    
                 }
             }
         }

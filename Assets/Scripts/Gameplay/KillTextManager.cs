@@ -2,7 +2,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 
-namespace Player.PlayerCanvas
+namespace Gameplay
 {
     public class KillTextManager : MonoBehaviour
     {
